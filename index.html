@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Hard Mile — Pro Aliis Milia Duramus</title>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      /* Hard Mile palette — pulled from logo */
+      --black:   #0a0a0a;
+      --black2:  #111111;
+      --black3:  #1a1a1a;
+      --cream:   #e8e0d0;
+      --cream-d: #c8bfae;
+      --cream-l: #f2ede4;
+      --gold:    #c9a84c;
+      --gold-l:  #e8c97a;
+      --white:   #ffffff;
+      --line:    rgba(232,224,208,0.1);
+      --line-str:rgba(232,224,208,0.2);
+      /* charity challenge accent */
+      --or:      #e8821a;
+      --or-d:    #c96d10;
+      --or-l:    #f5a24b;
+    }
+    html{scroll-behavior:smooth}
+    body{background:var(--black);color:var(--cream-d);font-family:'DM Sans',sans-serif;overflow-x:hidden;line-height:1.6}
+
+    /* ══════════════════════════════════
+       NAV
+    ══════════════════════════════════ */
+    nav{
+      position:fixed;top:0;left:0;right:0;z-index:300;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 2.5rem;height:68px;
+      background:rgba(10,10,10,0.97);
+      backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--line-str);
+    }
+    .nav-brand{display:flex;align-items:center;gap:.9rem;text-decoration:none}
+    .nav-logo{height:44px;width:44px;object-fit:contain;border-radius:4px}
+    .nav-title{line-height:1.1}
+    .nav-title-top{
+      font-family:'Oswald',sans-serif;font-size:1rem;font-weight:600;
+      letter-spacing:.18em;text-transform:uppercase;color:var(--cream-l);
+    }
+    .nav-title-bot{
+      font-size:.52rem;font-weight:600;letter-spacing:.28em;
+      text-transform:uppercase;color:var(--gold);
+      font-style:italic;
+    }
+    .nav-links{list-style:none;display:flex;align-items:center;gap:1.8rem}
+    nav a{text-decoration:none;color:var(--cream-d);font-size:.7rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;transition:color .2s}
+    nav a:hover{color:var(--cream-l)}
+    .nav-cta{
+      background:var(--cream)!important;color:var(--black)!important;
+      padding:.48rem 1.2rem!important;border-radius:2px;
+      font-weight:700!important;
+    }
+    .nav-cta:hover{background:var(--cream-l)!important;color:var(--black)!important}
+
+    /* hamburger */
+    .hbg{display:none;flex-direction:column;justify-content:center;gap:5px;width:32px;height:32px;cursor:pointer;background:none;border:none;padding:3px}
+    .hbg span{display:block;height:2px;background:var(--cream-d);border-radius:2px;transition:all .28s}
+    .hbg.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+    .hbg.open span:nth-child(2){opacity:0}
+    .hbg.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+    .mob{display:none;position:fixed;top:68px;left:0;right:0;background:rgba(10,10,10,.99);backdrop-filter:blur(14px);border-bottom:1px solid var(--line-str);z-index:299;padding:1.5rem 2rem 2rem;flex-direction:column;transform:translateY(-110%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+    .mob.open{transform:translateY(0)}
+    .mob a{font-size:.84rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--cream-d);text-decoration:none;padding:.9rem 0;border-bottom:1px solid var(--line);display:block;transition:color .2s}
+    .mob a:hover{color:var(--cream-l)}
+    .mob .mcta{background:var(--cream);color:var(--black);text-align:center;padding:.9rem;border-radius:2px;border:none;margin-top:1.2rem;font-weight:700}
+
+    /* ══════════════════════════════════
+       SCROLL HERO — ROAD REVEAL
+    ══════════════════════════════════ */
+
+    /* The scroll container is tall — gives us scroll distance to animate against */
+    .road-scroll-container{
+      position:relative;
+      height:500vh; /* 5 screens of scroll travel */
+      background:var(--black);
+    }
+
+    /* Sticky inner — stays fixed in viewport while parent scrolls */
+    .road-sticky{
+      position:sticky;
+      top:0;
+      height:100vh;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    /* Faint photo background — revealed as scroll progresses */
+    .road-bg{
+      position:absolute;inset:0;
+      background:
+        linear-gradient(to bottom,rgba(10,10,10,.85) 0%,rgba(10,10,10,.6) 50%,rgba(10,10,10,.9) 100%),
+        url('hero-run.jpeg') center 35%/cover no-repeat;
+      opacity:0;
+      transition:opacity .6s ease;
+    }
+    .road-grain{
+      position:absolute;inset:0;pointer-events:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+      opacity:.18;
+    }
+
+    /* Road SVG — hidden during opening icon frame, fades in from layer 1 */
+    .road-svg-wrap{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none;
+      z-index:2;
+      opacity:0;
+      transition:opacity .7s ease;
+    }
+    .road-svg-wrap.road-visible{ opacity:1; }
+    #roadSvg{
+      width:100%;
+      height:100%;
+      overflow:visible;
+    }
+
+    /* The road path itself — drawn by scroll */
+    #roadPath{
+      fill:none;
+      stroke:rgba(232,224,208,0.12);
+      stroke-width:80;
+      stroke-linecap:butt;
+    }
+    /* Centre dashes */
+    #roadDashes{
+      fill:none;
+      stroke:rgba(232,224,208,0.7);
+      stroke-width:4;
+      stroke-linecap:round;
+      stroke-dasharray:22 18;
+    }
+    /* Edge lines — bold white matching the logo */
+    #roadLeft,#roadRight{
+      fill:none;
+      stroke:rgba(255,255,255,0.9);
+      stroke-width:7;
+      stroke-linecap:round;
+    }
+
+    /* Content layers — each fades/slides in at a scroll beat */
+    .road-layer{
+      position:absolute;
+      inset:0;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:0 1.5rem;
+      opacity:0;
+      transform:translateY(16px);
+      /* No transition by default — prevents layers bleeding into each other */
+      transition:none;
+      pointer-events:none;
+    }
+    .road-layer.visible{
+      opacity:1;
+      transform:none;
+      pointer-events:auto;
+      /* Only animate IN, never animate out (instant hide prevents clash) */
+      transition:opacity .5s ease, transform .5s ease;
+    }
+
+    /* Layer 0 — Road icon + tagline */
+    .rl-road-icon{
+      width:min(580px,88vw);
+      height:min(580px,88vw);
+      object-fit:contain;
+      margin-bottom:1.2rem;
+      filter:drop-shadow(0 0 60px rgba(0,0,0,1));
+      /* Push it up slightly so tagline sits naturally below centre */
+      margin-top:-3rem;
+    }
+    .rl-tagline{
+      font-family:'Oswald',sans-serif;
+      font-size:clamp(.9rem,2.5vw,1.4rem);
+      font-weight:300;
+      letter-spacing:.38em;
+      text-transform:uppercase;
+      color:rgba(232,224,208,.5);
+      line-height:1.4;
+    }
+    .rl-tagline em{
+      color:var(--cream-l);
+      font-style:normal;
+      font-weight:500;
+    }
+
+    /* Layer 1 — Live pill + eyebrow */
+    .rl-pill{
+      display:inline-flex;align-items:center;gap:.5rem;
+      background:rgba(232,224,208,.08);
+      border:1px solid rgba(232,224,208,.22);
+      border-radius:100px;
+      padding:.42rem 1.1rem;
+      font-size:.62rem;font-weight:700;
+      letter-spacing:.26em;text-transform:uppercase;
+      color:var(--cream-d);
+      margin-bottom:1rem;
+    }
+    .rl-pill::before{
+      content:'';width:6px;height:6px;border-radius:50%;
+      background:var(--gold);
+      animation:blink 1.8s infinite;
+    }
+    .rl-eyebrow{
+      font-size:.66rem;font-weight:600;letter-spacing:.28em;
+      text-transform:uppercase;color:rgba(232,224,208,.4);
+      margin-bottom:.5rem;
+    }
+
+    /* Layer 2 — Big title */
+    .rl-title{
+      font-family:'Oswald',sans-serif;
+      font-size:clamp(3.5rem,12vw,9.5rem);
+      font-weight:700;line-height:.88;
+      letter-spacing:.02em;text-transform:uppercase;
+      color:var(--cream-l);
+      text-shadow:0 4px 40px rgba(0,0,0,.9);
+    }
+    .rl-title em{color:var(--gold);font-style:normal}
+
+    /* Layer 3 — Route + latin */
+    .rl-route{
+      font-family:'Oswald',sans-serif;
+      font-size:clamp(1.1rem,3vw,2rem);
+      font-weight:500;letter-spacing:.18em;
+      text-transform:uppercase;
+      color:var(--cream-d);
+      margin-bottom:.7rem;
+    }
+    .rl-route em{color:var(--gold);font-style:normal}
+    .rl-latin{
+      font-family:'Lora',serif;font-style:italic;
+      font-size:clamp(.82rem,1.6vw,1rem);
+      color:rgba(232,224,208,.38);
+      letter-spacing:.1em;
+    }
+
+    /* Layer 4 — Stats */
+    .rl-stats{
+      display:flex;gap:0;
+      border:1px solid rgba(232,224,208,.14);
+      border-radius:3px;
+      overflow:hidden;
+      margin-bottom:0;
+    }
+    .rl-stat{
+      padding:1.2rem 2.2rem;
+      border-right:1px solid rgba(232,224,208,.1);
+      background:rgba(10,10,10,.65);
+      backdrop-filter:blur(8px);
+      opacity:0;
+      transform:translateY(12px);
+      transition:opacity .4s ease,transform .4s ease;
+    }
+    .rl-stat:last-child{border-right:none}
+    .rl-stat.vis{opacity:1;transform:none}
+    .rl-stat-n{
+      font-family:'Oswald',sans-serif;
+      font-size:clamp(1.6rem,4vw,2.6rem);
+      font-weight:700;color:var(--cream-l);
+      letter-spacing:.02em;line-height:1;
+    }
+    .rl-stat-l{
+      font-size:.58rem;font-weight:700;
+      letter-spacing:.2em;text-transform:uppercase;
+      color:rgba(232,224,208,.38);margin-top:.3rem;
+    }
+
+    /* Layer 5 — CTAs + sub */
+    .rl-sub{
+      font-size:clamp(.88rem,1.8vw,1.05rem);
+      color:rgba(232,224,208,.6);
+      max-width:480px;line-height:1.7;
+      margin-bottom:2rem;
+    }
+    .rl-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+
+    /* scroll nudge at bottom of sticky view */
+    .road-scroll-nudge{
+      position:absolute;bottom:2.2rem;left:50%;
+      transform:translateX(-50%);
+      display:flex;flex-direction:column;align-items:center;gap:.5rem;
+      font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;
+      color:rgba(232,224,208,.22);
+      animation:bob 2.4s infinite;
+      pointer-events:none;
+    }
+    .road-scroll-nudge::after{
+      content:'';width:1px;height:34px;
+      background:linear-gradient(to bottom,rgba(232,224,208,.2),transparent);
+    }
+
+    /* mobile — reduce road travel */
+    @media(max-width:600px){
+      .road-scroll-container{height:420vh}
+      .rl-stats{flex-direction:column;gap:0}
+      .rl-stat{border-right:none;border-bottom:1px solid rgba(232,224,208,.1);padding:1rem 2rem}
+      .rl-stat:last-child{border-bottom:none}
+      .rl-btns{flex-direction:column;align-items:stretch}
+      .rl-btns .btn{text-align:center}
+    }
+    .hero-pill{
+      display:inline-flex;align-items:center;gap:.5rem;
+      background:rgba(232,224,208,.08);border:1px solid rgba(232,224,208,.2);
+      border-radius:100px;padding:.4rem 1rem;
+      font-size:.63rem;font-weight:700;letter-spacing:.25em;text-transform:uppercase;
+      color:var(--cream-d);margin-bottom:1.2rem;
+      animation:fadeUp .8s .04s ease both;
+    }
+    .hero-pill::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--gold);animation:blink 1.8s infinite}
+
+    .hero-eyebrow{
+      font-size:.65rem;font-weight:600;letter-spacing:.32em;
+      text-transform:uppercase;color:rgba(232,224,208,.4);
+      margin-bottom:.7rem;animation:fadeUp .9s .08s ease both;
+    }
+    .hero-title{
+      font-family:'Oswald',sans-serif;
+      font-size:clamp(3.5rem,11vw,9rem);
+      font-weight:700;line-height:.92;
+      letter-spacing:.02em;text-transform:uppercase;
+      color:var(--cream-l);animation:fadeUp .9s .1s ease both;
+    }
+    .hero-title em{color:var(--gold);font-style:normal}
+    .hero-latin{
+      font-family:'Lora',serif;font-style:italic;
+      font-size:clamp(.85rem,1.8vw,1.1rem);
+      color:rgba(232,224,208,.45);
+      letter-spacing:.08em;margin-top:1rem;
+      animation:fadeUp 1s .16s ease both;
+    }
+    .hero-sub{
+      font-size:clamp(.9rem,2vw,1.15rem);
+      color:rgba(232,224,208,.65);
+      margin-top:.6rem;max-width:540px;margin-left:auto;margin-right:auto;
+      line-height:1.7;animation:fadeUp 1s .2s ease both;
+    }
+    .hero-btns{
+      margin-top:2.5rem;display:flex;gap:1rem;justify-content:center;
+      flex-wrap:wrap;animation:fadeUp 1s .26s ease both;
+    }
+
+    /* ══════════════════════════════════
+       BUTTONS
+    ══════════════════════════════════ */
+    .btn{display:inline-block;text-decoration:none;font-family:'DM Sans',sans-serif;font-weight:700;font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;padding:.88rem 2rem;border-radius:2px;transition:transform .2s,box-shadow .2s,background .2s;cursor:pointer;border:none}
+    .btn-cream{background:var(--cream);color:var(--black);box-shadow:0 4px 20px rgba(232,224,208,.15)}
+    .btn-cream:hover{background:var(--cream-l);transform:translateY(-2px);box-shadow:0 8px 28px rgba(232,224,208,.22)}
+    .btn-ghost{background:transparent;color:var(--cream-l);border:1.5px solid rgba(232,224,208,.22)}
+    .btn-ghost:hover{border-color:var(--cream-d);color:var(--cream-l);transform:translateY(-2px)}
+    .btn-or{background:var(--or);color:#fff;box-shadow:0 4px 20px rgba(232,130,26,.35)}
+    .btn-or:hover{background:var(--or-d);transform:translateY(-2px);box-shadow:0 8px 26px rgba(232,130,26,.45)}
+    .btn-gold{background:var(--gold);color:var(--black)}
+    .btn-gold:hover{background:var(--gold-l);transform:translateY(-2px)}
+
+    .scroll-cue{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(232,224,208,.24);display:flex;flex-direction:column;align-items:center;gap:.5rem;animation:bob 2.4s infinite}
+    .scroll-cue::after{content:'';width:1px;height:36px;background:linear-gradient(to bottom,rgba(232,224,208,.22),transparent)}
+
+    /* ══════════════════════════════════
+       RAISED BAND
+    ══════════════════════════════════ */
+    .raised-band{
+      background:var(--cream);padding:2.2rem 2rem;
+      text-align:center;position:relative;overflow:hidden;
+    }
+    .raised-band::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(0,0,0,.04) 0px,rgba(0,0,0,.04) 1px,transparent 1px,transparent 12px)}
+    .raised-inner{position:relative;display:flex;align-items:center;justify-content:center;gap:2.5rem;flex-wrap:wrap}
+    .raised-label{font-size:.66rem;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:rgba(10,10,10,.55)}
+    .raised-amount-wrap{min-width:280px;text-align:center}
+    .raised-amount{font-family:'Oswald',sans-serif;font-size:clamp(2.4rem,7vw,4rem);font-weight:700;color:var(--black);letter-spacing:-.01em;line-height:1;font-variant-numeric:tabular-nums}
+    .raised-sub{font-size:.68rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:rgba(10,10,10,.5);line-height:1.6}
+
+    /* ══════════════════════════════════
+       SHARED SECTION STYLES
+    ══════════════════════════════════ */
+    .sec-lbl{font-size:.63rem;font-weight:700;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);margin-bottom:.6rem}
+    .sec-title{font-family:'Oswald',sans-serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--cream-l);line-height:1;margin-bottom:1rem}
+    .sec-title em{color:var(--gold);font-style:normal}
+    .sec-rule{width:48px;height:2px;background:var(--gold);margin-bottom:1.8rem;opacity:.6}
+    .sec-body{font-size:.9rem;line-height:1.85;color:rgba(232,224,208,.65)}
+
+    /* ══════════════════════════════════
+       SPONSORS
+    ══════════════════════════════════ */
+    .sponsors-section{padding:5rem 2rem;border-bottom:1px solid var(--line)}
+    .sec-head{text-align:center;margin-bottom:3rem}
+    .sp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;max-width:1100px;margin:0 auto}
+    .sp-card{background:var(--black3);border:1px solid var(--line);border-radius:4px;padding:3rem 2rem 2.5rem;display:flex;flex-direction:column;align-items:center;gap:1.4rem;text-decoration:none;transition:border-color .25s,transform .25s}
+    .sp-card:hover{border-color:var(--cream-d);transform:translateY(-4px)}
+    .sp-logo-wrap{width:160px;height:110px;display:flex;align-items:center;justify-content:center}
+    .sp-logo-wrap img{max-width:100%;max-height:100%;object-fit:contain;border-radius:3px}
+    .sp-logo-wrap.light-bg{background:#fff;border-radius:4px;padding:12px}
+    .sp-logo-wrap.grey-bg{background:#efefef;border-radius:4px;padding:12px}
+    .sp-logo-wrap.dark-bg{background:#3a3a3a;border-radius:4px;padding:12px}
+    .sp-name{font-size:.78rem;font-weight:700;letter-spacing:.1em;color:var(--cream-l);text-align:center;text-transform:uppercase}
+    .sp-hint{font-size:.62rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+
+    /* ══════════════════════════════════
+       VIDEO CAROUSEL
+    ══════════════════════════════════ */
+    .video-section{padding:6rem 0;background:var(--black2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+    .video-head{text-align:center;padding:0 2rem;margin-bottom:3rem}
+    .car-outer{position:relative;overflow:hidden;padding:0 2rem}
+    .car-track{display:flex;gap:1.5rem;transition:transform .45s cubic-bezier(.4,0,.2,1);will-change:transform;justify-content:center}
+    .vid-card{flex:0 0 calc(33.333% - 1rem);min-width:220px;max-width:300px;background:var(--black3);border:1px solid var(--line);border-radius:6px;overflow:hidden;transition:border-color .25s,transform .25s}
+    .vid-card:hover{border-color:var(--cream-d);transform:translateY(-4px)}
+    .vid-thumb{position:relative;width:100%;aspect-ratio:9/16;background:#000;overflow:hidden;cursor:pointer}
+    .yt-thumb{aspect-ratio:9/16!important;cursor:default;max-height:480px}
+    .vid-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;background:linear-gradient(135deg,#1a1a1a,#111)}
+    .vid-placeholder svg{width:34px;height:34px;opacity:.2}
+    .vid-placeholder span{font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(232,224,208,.2)}
+    .vid-info{padding:1.1rem}
+    .vid-date{font-size:.58rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:.35rem}
+    .vid-title{font-family:'Oswald',sans-serif;font-size:.9rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--cream-l);line-height:1.15;margin-bottom:.35rem}
+    .vid-desc{font-size:.74rem;color:rgba(232,224,208,.5);line-height:1.6}
+    .car-controls{display:flex;align-items:center;justify-content:center;gap:1rem;margin-top:2.5rem;padding:0 2rem}
+    .car-btn{width:42px;height:42px;border-radius:50%;background:var(--black3);border:1px solid var(--line);color:var(--cream-d);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,background .2s}
+    .car-btn:hover{border-color:var(--cream-d);background:rgba(232,224,208,.06)}
+    .car-btn:disabled{opacity:.3;cursor:default}
+    .car-btn svg{width:18px;height:18px}
+    .car-dots{display:flex;gap:.5rem;align-items:center}
+    .car-dot{width:7px;height:7px;border-radius:50%;background:rgba(232,224,208,.18);transition:background .2s,transform .2s;cursor:pointer;border:none;padding:0}
+    .car-dot.active{background:var(--cream-d);transform:scale(1.35)}
+
+    /* ══════════════════════════════════
+       THE HARD MILE — COMMUNITY SECTION
+    ══════════════════════════════════ */
+    .hm-section{background:var(--black);border-top:2px solid var(--line-str);position:relative;overflow:hidden}
+    .hm-section::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(-55deg,transparent,transparent 40px,rgba(232,224,208,.012) 40px,rgba(232,224,208,.012) 41px);pointer-events:none}
+
+    /* hero block */
+    .hm-hero{position:relative;min-height:75vh;display:flex;align-items:center;padding:7rem 2rem;overflow:hidden}
+    .hm-hero-bg{
+      position:absolute;inset:0;
+      background:
+        linear-gradient(to right,rgba(10,10,10,.97) 38%,rgba(10,10,10,.7) 68%,rgba(10,10,10,.25) 100%),
+        url('https://images.unsplash.com/photo-1551632811-561732d1e306?w=1600&q=80') center/cover no-repeat;
+    }
+    .hm-hero-content{position:relative;z-index:1;max-width:600px}
+    .hm-logo-wrap{margin-bottom:2rem}
+    .hm-logo{width:160px;height:160px;object-fit:contain}
+    .hm-eyebrow{font-size:.65rem;font-weight:700;letter-spacing:.35em;text-transform:uppercase;color:rgba(232,224,208,.38);margin-bottom:.6rem}
+    .hm-title{font-family:'Oswald',sans-serif;font-size:clamp(2.8rem,7vw,5.5rem);font-weight:700;text-transform:uppercase;letter-spacing:.02em;color:var(--cream-l);line-height:.92;margin-bottom:.8rem}
+    .hm-title em{color:var(--gold);font-style:normal}
+    .hm-latin{font-family:'Lora',serif;font-style:italic;font-size:.9rem;color:rgba(232,224,208,.38);letter-spacing:.1em;margin-bottom:1.2rem}
+    .hm-rule{width:56px;height:2px;background:linear-gradient(to right,var(--gold),transparent);margin:1.2rem 0}
+    .hm-age{display:inline-flex;align-items:center;gap:.4rem;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.22);border-radius:2px;padding:.35rem .9rem;font-size:.6rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:1.5rem}
+    .hm-tagline{font-family:'Lora',serif;font-style:italic;font-size:clamp(.92rem,1.9vw,1.2rem);color:rgba(232,224,208,.58);line-height:1.65;margin-bottom:2rem}
+    .hm-hero-btns{display:flex;gap:.8rem;flex-wrap:wrap}
+
+    /* pillars */
+    .hm-pillars{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line)}
+    .hm-pillar{background:var(--black2);padding:2.5rem 1.8rem}
+    .hm-pillar-icon{width:40px;height:40px;border:1.5px solid rgba(201,168,76,.5);border-radius:2px;display:flex;align-items:center;justify-content:center;margin-bottom:1rem}
+    .hm-pillar-icon svg{width:20px;height:20px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+    .hm-pillar-title{font-family:'Oswald',sans-serif;font-size:.95rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--cream-l);margin-bottom:.5rem;line-height:1}
+    .hm-pillar-body{font-size:.78rem;color:rgba(232,224,208,.42);line-height:1.7}
+
+    .hm-day{padding:5rem 2rem;max-width:1100px;margin:0 auto}
+    /* Two column: steps left, reward card right — reward card starts level with first step */
+    .hm-day-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start}
+    /* Push reward card down to align with step content, past the section header */
+    .hm-aside-col{padding-top:0}
+    /* Floating logo above the aside */
+    .hm-float-logo{
+      width:120px;height:120px;
+      object-fit:contain;
+      display:block;
+      margin:0 auto 1.5rem;
+      filter:drop-shadow(0 4px 24px rgba(0,0,0,.8));
+    }
+    .hm-steps{display:flex;flex-direction:column}
+    .hm-step{display:flex;gap:1.2rem;padding:1.3rem 0;border-bottom:1px solid var(--line)}
+    .hm-step:last-child{border-bottom:none}
+    .hm-step-num{font-family:'Oswald',sans-serif;font-size:1.8rem;font-weight:700;color:var(--gold);opacity:.28;line-height:1;flex-shrink:0;width:2rem;text-align:right}
+    .hm-step-title{font-family:'Oswald',sans-serif;font-size:.88rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--cream-l);margin-bottom:.25rem}
+    .hm-step-body{font-size:.78rem;color:rgba(232,224,208,.44);line-height:1.6}
+
+    /* rewards */
+    .hm-aside{background:var(--black3);border:1px solid var(--line-str);border-radius:4px;padding:2.5rem}
+    .hm-aside-title{font-family:'Oswald',sans-serif;font-size:1.3rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--cream-l);margin-bottom:1.5rem;line-height:1}
+    .hm-aside-title em{color:var(--gold);font-style:normal}
+    .hm-reward{display:flex;align-items:flex-start;gap:.8rem;margin-bottom:1.1rem;padding-bottom:1.1rem;border-bottom:1px solid var(--line)}
+    .hm-reward:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+    .hm-reward-icon{width:34px;height:34px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);border-radius:2px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .hm-reward-icon svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+    .hm-reward-label{font-family:'Oswald',sans-serif;font-size:.84rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--cream-l);margin-bottom:.2rem}
+    .hm-reward-desc{font-size:.75rem;color:rgba(232,224,208,.42);line-height:1.55}
+
+    /* waitlist */
+    .hm-waitlist{background:var(--black2);border-top:1px solid var(--line-str);padding:5rem 2rem;text-align:center}
+    .hm-waitlist-inner{max-width:520px;margin:0 auto}
+    .hm-waitlist-title{font-family:'Oswald',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--cream-l);margin-bottom:.8rem;line-height:1}
+    .hm-waitlist-title em{color:var(--gold);font-style:normal}
+    .hm-waitlist-body{font-size:.86rem;color:rgba(232,224,208,.46);line-height:1.75;margin-bottom:2rem}
+    .hm-form{display:flex;gap:.8rem;flex-wrap:wrap;justify-content:center}
+    .hm-input{flex:1;min-width:220px;background:rgba(232,224,208,.05);border:1px solid rgba(232,224,208,.18);border-radius:2px;padding:.85rem 1.1rem;font-family:'DM Sans',sans-serif;font-size:.84rem;color:var(--cream-l);outline:none;transition:border-color .2s}
+    .hm-input::placeholder{color:rgba(232,224,208,.24)}
+    .hm-input:focus{border-color:rgba(232,224,208,.45)}
+    .hm-submit{background:var(--cream);color:var(--black);font-family:'DM Sans',sans-serif;font-weight:700;font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;padding:.85rem 1.8rem;border:none;border-radius:2px;cursor:pointer;transition:background .2s,transform .2s;white-space:nowrap}
+    .hm-submit:hover{background:var(--cream-l);transform:translateY(-2px)}
+    .hm-success{display:none;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.22);border-radius:2px;padding:1rem 1.5rem;font-size:.82rem;color:var(--gold-l);margin-top:1rem;text-align:center}
+    .hm-note{font-size:.64rem;color:rgba(232,224,208,.24);margin-top:1rem;letter-spacing:.05em}
+
+    /* ══════════════════════════════════
+       ABOUT
+    ══════════════════════════════════ */
+    .about-section{padding:8rem 2rem;max-width:900px;margin:0 auto;text-align:center}
+    .about-quote{font-family:'Lora',serif;font-style:italic;font-size:clamp(1.2rem,2.8vw,1.85rem);color:var(--cream-l);line-height:1.65;margin-bottom:2rem;position:relative;padding-top:2.5rem}
+    .about-quote::before{content:'\201C';font-size:7rem;color:rgba(201,168,76,.1);font-family:'Lora',serif;position:absolute;top:-1rem;left:-.5rem;line-height:1}
+    .about-body{font-size:.9rem;line-height:1.88;color:rgba(232,224,208,.55);max-width:640px;margin:0 auto}
+    .about-latin{font-family:'Lora',serif;font-style:italic;font-size:1rem;color:rgba(201,168,76,.65);letter-spacing:.1em;margin-top:1.8rem}
+
+    /* ══════════════════════════════════
+       CHALLENGE HISTORY
+    ══════════════════════════════════ */
+    .ch-panel{min-height:90vh;position:relative;display:flex;flex-direction:column;overflow:hidden}
+    .ch-panel:nth-child(even) .ch-hero-content{margin-left:auto}
+    /* Taller hero — much more image visible */
+    .ch-hero{position:relative;flex:0 0 75vh;overflow:hidden}
+    /* Use center 30% — shows faces not just sky/floor */
+    .ch-hero-img{position:absolute;inset:0;background-size:cover;background-position:center 30%;filter:brightness(.45) saturate(.7);transition:filter .5s}
+    .ch-panel:hover .ch-hero-img{filter:brightness(.38) saturate(.6)}
+    .ch-hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,var(--black) 100%)}
+    .ch-hero-content{position:relative;z-index:1;padding:4rem 4rem 3rem;max-width:660px}
+    .ch-year{font-family:'Oswald',sans-serif;font-size:4.5rem;font-weight:700;color:rgba(232,224,208,.07);line-height:1;margin-bottom:-.8rem;letter-spacing:-.03em}
+    .ch-tag{font-size:.58rem;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:.8rem;display:flex;align-items:center;gap:.6rem}
+    .ch-tag::before{content:'';width:24px;height:1.5px;background:var(--gold);border-radius:1px}
+    .ch-name{font-family:'Oswald',sans-serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:700;text-transform:uppercase;letter-spacing:-.01em;color:var(--cream-l);line-height:.95;margin-bottom:.8rem}
+    .ch-name em{color:var(--gold);font-style:normal}
+    .ch-who{font-size:.68rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:rgba(232,224,208,.38);margin-bottom:1.2rem}
+    .ch-charity{display:inline-flex;align-items:center;gap:.5rem;background:rgba(232,224,208,.06);border:1px solid rgba(232,224,208,.12);border-radius:2px;padding:.4rem .8rem;font-size:.66rem;font-weight:600;letter-spacing:.08em;color:var(--cream-d);margin-bottom:1.2rem}
+    /* Taller photo strip — actually shows the photos */
+    .ch-photos{display:flex;gap:2px;height:380px;flex-shrink:0}
+    .ch-photo{flex:1;overflow:hidden;position:relative}
+    .ch-photo img{width:100%;height:100%;object-fit:cover;object-position:center 20%;transition:transform .5s,filter .5s;filter:brightness(.8) saturate(.85)}
+    .ch-photo:hover img{transform:scale(1.04);filter:brightness(1) saturate(1)}
+    .ch-body-wrap{background:var(--black);padding:3rem 4rem 5rem}
+    .ch-body{font-family:'Lora',serif;font-size:.92rem;line-height:1.88;color:rgba(232,224,208,.6);margin-bottom:1.8rem;max-width:660px}
+    .ch-stats{display:flex;gap:2rem;flex-wrap:wrap;margin-bottom:1.8rem;max-width:660px}
+    .ch-stat{border-left:2px solid var(--gold);padding-left:1rem;opacity:.7}
+    .ch-stat-n{font-family:'Oswald',sans-serif;font-size:1.8rem;font-weight:700;color:var(--cream-l);line-height:1;letter-spacing:-.02em}
+    .ch-stat-l{font-size:.56rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--cream-d);opacity:.5;margin-top:.2rem}
+    .ch-divider{height:1px;background:var(--line)}
+
+    /* ── Meet the Team ── */
+    .team-section{background:var(--black2);border-top:1px solid var(--line);padding:5rem 2rem}
+    .team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;max-width:1100px;margin:2.5rem auto 0}
+    .team-card{background:var(--black3);border:1px solid var(--line);border-radius:4px;padding:2rem 1.6rem;transition:border-color .25s,transform .25s}
+    .team-card:hover{border-color:var(--cream-d);transform:translateY(-3px)}
+    .team-initials{
+      width:56px;height:56px;border-radius:50%;
+      background:rgba(201,168,76,.1);
+      border:1.5px solid rgba(201,168,76,.35);
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Oswald',sans-serif;font-size:1.1rem;font-weight:600;
+      color:var(--gold);letter-spacing:.05em;
+      margin-bottom:1.1rem;
+    }
+    .team-name{font-family:'Oswald',sans-serif;font-size:1.05rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--cream-l);margin-bottom:.25rem;line-height:1}
+    .team-location{font-size:.62rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:.7rem}
+    .team-role{font-size:.8rem;color:rgba(232,224,208,.5);line-height:1.65}
+
+    /* ══════════════════════════════════
+       FOOTER
+    ══════════════════════════════════ */
+    footer{background:var(--black2);border-top:1px solid var(--line-str);padding:3.5rem 2rem 2rem}
+    .footer-inner{max-width:1100px;margin:0 auto;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:2.5rem}
+    .footer-logo{width:80px;height:80px;object-fit:contain;margin-bottom:.8rem}
+    .footer-tagline{font-family:'Lora',serif;font-style:italic;font-size:.78rem;color:rgba(232,224,208,.35);max-width:220px;line-height:1.6}
+    .footer-links{display:flex;flex-direction:column;gap:.6rem}
+    .footer-links a{font-size:.7rem;font-weight:500;letter-spacing:.1em;color:rgba(232,224,208,.45);text-decoration:none;transition:color .2s;text-transform:uppercase}
+    .footer-links a:hover{color:var(--cream-l)}
+    .footer-bottom{max-width:1100px;margin:2rem auto 0;padding-top:1.5rem;border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;font-size:.65rem;color:rgba(232,224,208,.2);letter-spacing:.08em}
+    .footer-bottom a{color:var(--gold);text-decoration:none}
+
+    /* ══════════════════════════════════
+       ANIMATIONS
+    ══════════════════════════════════ */
+    @keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+    @keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.6)}}
+    @keyframes bob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(7px)}}
+
+    .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+    .reveal.vis{opacity:1;transform:none}
+
+    /* ══════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════ */
+    @media(max-width:820px){
+      .nav-links{display:none}.hbg{display:flex}.mob{display:flex}
+      nav{padding:0 1.5rem}
+      .hm-pillars{grid-template-columns:1fr 1fr}
+      .hm-day-grid{grid-template-columns:1fr;gap:2.5rem}
+      .hm-hero{padding:5rem 1.5rem}
+      .sp-grid{grid-template-columns:repeat(2,1fr)}
+      .team-grid{grid-template-columns:repeat(2,1fr)}
+      .hm-day{padding:4rem 1.5rem}
+      .hm-waitlist{padding:4rem 1.5rem}
+      .ch-hero-content{padding:3.5rem 1.5rem 2.5rem}
+      .ch-body-wrap{padding:2.5rem 1.5rem 4rem}
+      .ch-photos{height:180px}
+      .vid-card{flex:0 0 min(72vw,260px)}
+      .footer-inner{flex-direction:column}
+      .sp-grid{grid-template-columns:repeat(2,1fr)}
+    }
+    @media(max-width:480px){
+      .hero-btns,.hm-hero-btns{flex-direction:column;align-items:stretch}
+      .hero-btns .btn,.hm-hero-btns .btn{text-align:center}
+      .hm-pillars{grid-template-columns:1fr}
+      .hm-form{flex-direction:column}
+      .hm-submit{width:100%}
+      .ch-photos{height:130px}
+      .team-grid{grid-template-columns:1fr}
+      .sp-grid{grid-template-columns:1fr 1fr}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav>
+  <a class="nav-brand" href="#" aria-label="The Hard Mile">
+    <img src="hardmile-logo.png" alt="The Hard Mile" class="nav-logo"/>
+    <div class="nav-title">
+      <div class="nav-title-bot" style="font-size:.72rem;letter-spacing:.22em;color:var(--cream-d);font-style:italic;font-family:'Lora',serif;font-weight:400">Pro Aliis Milia Duramus</div>
+    </div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#challenge">Challenge</a></li>
+    <li><a href="#sponsors">Sponsors</a></li>
+    <li><a href="#updates">Updates</a></li>
+    <li><a href="#community">Community</a></li>
+    <li><a href="#history">History</a></li>
+    <li><a href="https://www.justgiving.com/page/500kmrun1?utm_medium=FR&utm_source=CL" target="_blank" rel="noopener" class="nav-cta">Donate Now</a></li>
+  </ul>
+  <button class="hbg" id="hbg" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+</nav>
+
+<!-- Mobile drawer -->
+<div class="mob" id="mob">
+  <a href="#challenge" class="mlink">Current Challenge</a>
+  <a href="#sponsors" class="mlink">Our Sponsors</a>
+  <a href="#updates" class="mlink">Video Updates</a>
+  <a href="#community" class="mlink">The Community</a>
+  <a href="#history" class="mlink">Challenge History</a>
+  <a href="https://www.justgiving.com/page/500kmrun1?utm_medium=FR&utm_source=CL" target="_blank" rel="noopener" class="mcta">Donate on JustGiving</a>
+</div>
+
+<!-- ══ SCROLL HERO — ROAD REVEAL ══ -->
+<div class="road-scroll-container" id="challenge">
+  <div class="road-sticky" id="roadSticky">
+
+    <!-- Background photo — fades in at scroll beat 3 -->
+    <div class="road-bg" id="roadBg"></div>
+    <div class="road-grain" aria-hidden="true"></div>
+
+    <!-- Road SVG drawn by scroll -->
+    <div class="road-svg-wrap" aria-hidden="true">
+      <svg id="roadSvg" viewBox="0 0 1000 900" preserveAspectRatio="xMidYMid slice">
+        <!-- Road surface -->
+        <path id="roadPath" d="M500,900 L500,900"/>
+        <!-- Left edge -->
+        <path id="roadLeft" d="M500,900 L500,900"/>
+        <!-- Right edge -->
+        <path id="roadRight" d="M500,900 L500,900"/>
+        <!-- Centre dashes -->
+        <path id="roadDashes" d="M500,900 L500,900"/>
+      </svg>
+    </div>
+
+    <!-- LAYER 0: Road icon + tagline — appears immediately -->
+    <div class="road-layer" id="rl0">
+      <img src="road-icon.png" alt="" class="rl-road-icon" aria-hidden="true"/>
+      <p class="rl-tagline">Take the <em>journey</em> with us</p>
+    </div>
+
+    <!-- LAYER 1: Live pill + eyebrow -->
+    <div class="road-layer" id="rl1" style="padding-top:0">
+      <div class="rl-pill">Live Challenge · Summer 2026</div>
+      <p class="rl-eyebrow">500K Relay Run · Scotland to Thirsk</p>
+    </div>
+
+    <!-- LAYER 2: Big title -->
+    <div class="road-layer" id="rl2">
+      <h1 class="rl-title">500<em>K</em><br>Relay Run</h1>
+    </div>
+
+    <!-- LAYER 3: Route + latin -->
+    <div class="road-layer" id="rl3">
+      <p class="rl-route"><em>Scotland</em> &nbsp;→&nbsp; <em>Thirsk</em></p>
+      <p class="rl-latin">Pro Aliis Milia Duramus — we endure miles for others</p>
+    </div>
+
+    <!-- LAYER 4: Stats -->
+    <div class="road-layer" id="rl4">
+      <div class="rl-stats">
+        <div class="rl-stat" id="rls0">
+          <div class="rl-stat-n">500+</div>
+          <div class="rl-stat-l">Kilometres</div>
+        </div>
+        <div class="rl-stat" id="rls1">
+          <div class="rl-stat-n">2</div>
+          <div class="rl-stat-l">Countries</div>
+        </div>
+        <div class="rl-stat" id="rls2">
+          <div class="rl-stat-n">1</div>
+          <div class="rl-stat-l">Team</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LAYER 5: Sub text + CTAs -->
+    <div class="road-layer" id="rl5">
+      <p class="rl-sub">In aid of the Charlie Dallas Lancaster Foundation. Help us every step of the way.</p>
+      <div class="rl-btns">
+        <a href="https://www.justgiving.com/page/500kmrun1?utm_medium=FR&utm_source=CL" target="_blank" rel="noopener" class="btn btn-cream">Donate Now</a>
+        <a href="#updates" class="btn btn-ghost">Watch Updates</a>
+      </div>
+    </div>
+
+    <!-- Scroll nudge -->
+    <div class="road-scroll-nudge" id="roadNudge">Scroll</div>
+
+  </div>
+</div>
+
+<!-- ══ TOTAL RAISED ══ -->
+<div class="raised-band">
+  <div class="raised-inner">
+    <span class="raised-label">The Hard Mile</span>
+    <div class="raised-amount-wrap">
+      <span class="raised-amount" id="raisedAmount">£13,445.20</span>
+    </div>
+    <span class="raised-sub">Total raised for local charities<br>across all challenges</span>
+  </div>
+</div>
+
+<!-- ══ SPONSORS ══ -->
+<section class="sponsors-section" id="sponsors">
+  <div class="sec-head reveal">
+    <p class="sec-lbl">Thank You</p>
+    <h2 class="sec-title">Our Brilliant <em>Sponsors</em></h2>
+    <p style="font-size:.82rem;color:rgba(232,224,208,.5);margin-top:.5rem">Without their generosity, none of this would be possible.</p>
+  </div>
+  <div class="sp-grid reveal">
+    <a class="sp-card" href="https://www.metcalfeservices.co.uk" target="_blank" rel="noopener">
+      <div class="sp-logo-wrap light-bg"><img src="logo-metcalfe.png" alt="Metcalfe Fencing & Land Services"/></div>
+      <div class="sp-name">Metcalfe Fencing</div>
+      <div class="sp-hint">Visit Site →</div>
+    </a>
+    <a class="sp-card" href="https://www.whitehorsecleaningservices.co.uk/" target="_blank" rel="noopener">
+      <div class="sp-logo-wrap light-bg"><img src="logo-whitehorse.jpeg" alt="White Horse Cleaning Services"/></div>
+      <div class="sp-name">White Horse Cleaning</div>
+      <div class="sp-hint">Visit Site →</div>
+    </a>
+    <a class="sp-card" href="https://inspire-av.com" target="_blank" rel="noopener">
+      <div class="sp-logo-wrap grey-bg"><img src="logo-inspire.gif" alt="Inspire Audio Visual"/></div>
+      <div class="sp-name">Inspire AV</div>
+      <div class="sp-hint">Visit Site →</div>
+    </a>
+    <a class="sp-card" href="https://thegreengrocer.co.uk/" target="_blank" rel="noopener">
+      <div class="sp-logo-wrap dark-bg"><img src="logo-greengrocer.png" alt="The Greengrocer"/></div>
+      <div class="sp-name">The Greengrocer</div>
+      <div class="sp-hint">Visit Site →</div>
+    </a>
+  </div>
+  <div style="text-align:center;margin-top:3rem" class="reveal">
+    <p style="font-size:.75rem;color:rgba(232,224,208,.35);margin-bottom:1rem">Interested in sponsoring our next challenge?</p>
+    <a href="mailto:hello@thehardmile.com" class="btn btn-ghost" style="font-size:.7rem;padding:.7rem 1.6rem">Get In Touch</a>
+  </div>
+</section>
+
+<!-- ══ VIDEO CAROUSEL ══ -->
+<section class="video-section" id="updates">
+  <div class="video-head reveal">
+    <p class="sec-lbl">Latest Updates</p>
+    <h2 class="sec-title">From The <em>Team</em></h2>
+    <p style="font-size:.82rem;color:rgba(232,224,208,.45);margin-top:.6rem">Updates from the road, the water, and wherever the next challenge takes us.</p>
+  </div>
+  <div class="car-outer" id="carOuter">
+    <div class="car-track" id="carTrack">
+
+      <div class="vid-card">
+        <div class="vid-thumb yt-thumb">
+          <iframe src="https://www.youtube.com/embed/PLZCzUhmpps?rel=0&playsinline=1" title="Matt — Get Involved" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;border:none"></iframe>
+        </div>
+        <div class="vid-info">
+          <div class="vid-date">2026 · 500K Relay Run</div>
+          <div class="vid-title">Matt — Get Involved</div>
+          <div class="vid-desc">Matt talks about how you can get involved and sponsor the challenge.</div>
+        </div>
+      </div>
+
+      <div class="vid-card">
+        <div class="vid-thumb yt-thumb">
+          <iframe src="https://www.youtube.com/embed/Tkum98oe1fE?rel=0&playsinline=1" title="Ben — The Challenge Format" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;border:none"></iframe>
+        </div>
+        <div class="vid-info">
+          <div class="vid-date">2026 · 500K Relay Run</div>
+          <div class="vid-title">Ben — The Challenge Format</div>
+          <div class="vid-desc">Ben breaks down the format of the 500K relay — how it works and who's involved.</div>
+        </div>
+      </div>
+
+      <div class="vid-card">
+        <div class="vid-thumb yt-thumb">
+          <iframe src="https://www.youtube.com/embed/KPo6gn82Hlk?rel=0&playsinline=1" title="Ash — About the Event" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;border:none"></iframe>
+        </div>
+        <div class="vid-info">
+          <div class="vid-date">2026 · 500K Relay Run</div>
+          <div class="vid-title">Ash — About the Event</div>
+          <div class="vid-desc">Ash talks about what the event means to the team and to the foundation.</div>
+        </div>
+      </div>
+
+      <div class="vid-card">
+        <div class="vid-thumb" style="cursor:default">
+          <div class="vid-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="3"/><path d="M10 8l6 4-6 4V8z"/></svg>
+            <span>Coming Soon</span>
+          </div>
+        </div>
+        <div class="vid-info">
+          <div class="vid-date">2026 · 500K Relay Run</div>
+          <div class="vid-title">More Updates</div>
+          <div class="vid-desc">More videos from the team dropping as the challenge progresses.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="car-controls">
+    <button class="car-btn" id="cPrev" aria-label="Previous" onclick="carMove(-1)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="car-dots" id="cDots"></div>
+    <button class="car-btn" id="cNext" aria-label="Next" onclick="carMove(1)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+</section>
+
+<!-- ══ ABOUT ══ -->
+<section class="about-section">
+  <p class="sec-lbl reveal">Who We Are</p>
+  <blockquote class="about-quote reveal">We endure miles for others. That's not a tagline — it's the reason we get up and do the hard thing.</blockquote>
+  <p class="about-body reveal">The Hard Mile is a collective of ordinary people doing extraordinary things, for the communities around us. We take on physical challenges that push the limits of what's possible, raise money for local charities, and create a space where young men can talk, grow, and earn something real. No corporate sponsors, no professional athletes. Just real working people who show up.</p>
+  <p class="about-latin reveal">Pro Aliis Milia Duramus — we endure miles for others</p>
+</section>
+
+<!-- ══ COMMUNITY / MEN'S GROUP ══ -->
+<section class="hm-section" id="community">
+
+  <div class="hm-hero">
+    <div class="hm-hero-bg"></div>
+    <div class="hm-hero-content">
+      <p class="hm-eyebrow">The Hard Mile · Day Challenges</p>
+      <h2 class="hm-title">The Hard Mile.<br><em>Earn the Badge.</em></h2>
+      <p class="hm-latin">Pro Aliis Milia Duramus</p>
+      <div class="hm-rule"></div>
+      <div class="hm-age">Ages 16–25 · Yorkshire &amp; North England</div>
+      <p class="hm-tagline">A safe space for young men to push themselves, disconnect from the noise, talk openly, and come home knowing they've earned something real.</p>
+      <div class="hm-hero-btns">
+        <a href="#hm-waitlist" class="btn btn-cream">Join the Waitlist</a>
+        <a href="#hm-what" class="btn btn-ghost">How It Works</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="hm-pillars" id="hm-what">
+    <div class="hm-pillar reveal">
+      <div class="hm-pillar-icon"><svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9"/></svg></div>
+      <div class="hm-pillar-title">Physical Challenge</div>
+      <div class="hm-pillar-body">Hiking, running, cold water — twice-yearly day events in the outdoors designed to test your limits alongside other young men.</div>
+    </div>
+    <div class="hm-pillar reveal">
+      <div class="hm-pillar-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
+      <div class="hm-pillar-title">No Phones, No Tech. Just Real Talk.</div>
+      <div class="hm-pillar-body">Phones away for the full day. Space to talk honestly about life, goals, and what's going on — with other men who get it.</div>
+    </div>
+    <div class="hm-pillar reveal">
+      <div class="hm-pillar-icon"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+      <div class="hm-pillar-title">The Badge</div>
+      <div class="hm-pillar-body">This is a symbol of your achievement on the day — something earned that many won't even sign up for. Become the exception.</div>
+    </div>
+    <div class="hm-pillar reveal">
+      <div class="hm-pillar-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+      <div class="hm-pillar-title">Reference</div>
+      <div class="hm-pillar-body">Add to your CV with a reference from our support crew — influential business owners in the area.</div>
+    </div>
+  </div>
+
+  <div class="hm-day">
+    <div class="hm-day-grid">
+      <div>
+        <p class="sec-lbl">The Format</p>
+        <h3 class="sec-title" style="margin-bottom:1.8rem">How the Day <em>Works</em></h3>
+        <div class="hm-steps">
+          <div class="hm-step"><div class="hm-step-num">1</div><div><div class="hm-step-title">Pre-Event Check-In &amp; Onboarding</div><div class="hm-step-body">We'll check you into The Hard Mile with a full briefing and invite you into our group chat — where we talk you through training and exactly how the day will go.</div></div></div>
+          <div class="hm-step"><div class="hm-step-num">2</div><div><div class="hm-step-title">Arrive &amp; Lock In</div><div class="hm-step-body">Phones away from the start. Meet the group, meet the crew, get briefed on the day ahead.</div></div></div>
+          <div class="hm-step"><div class="hm-step-num">3</div><div><div class="hm-step-title">The Physical Challenge</div><div class="hm-step-body">A structured outdoor challenge — hiking, trail running, cold water, or a mix. Hard enough to matter. Safe enough to do together.</div></div></div>
+          <div class="hm-step"><div class="hm-step-num">4</div><div><div class="hm-step-title">Open Circle</div><div class="hm-step-body">After the effort, the group sits together. No agenda — space to talk about life, goals, pressure, and whatever's on your mind.</div></div></div>
+          <div class="hm-step"><div class="hm-step-num">5</div><div><div class="hm-step-title">Earn Your Patch</div><div class="hm-step-body">Every attendee receives their achievement patch and a personal reference letter from a member of the support crew.</div></div></div>
+        </div>
+      </div>
+      <div class="hm-aside-col">
+        <p class="sec-lbl">What You Leave With</p>
+        <div class="hm-aside reveal">
+          <img src="road-icon.png" alt="The Hard Mile" class="hm-float-logo"/>
+          <div class="hm-aside-title">Every Attendee <em>Earns</em></div>
+          <div class="hm-reward">
+            <div class="hm-reward-icon"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div><div class="hm-reward-label">The Badge</div><div class="hm-reward-desc">A symbol of your achievement — something earned that many won't even sign up for. Become the exception.</div></div>
+          </div>
+          <div class="hm-reward">
+            <div class="hm-reward-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+            <div><div class="hm-reward-label">Reference</div><div class="hm-reward-desc">Add to your CV with a reference from our support crew — influential business owners in the area.</div></div>
+          </div>
+          <div class="hm-reward">
+            <div class="hm-reward-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
+            <div><div class="hm-reward-label">A Brotherhood</div><div class="hm-reward-desc">Connection with other young men who showed up. A network that grows with every event.</div></div>
+          </div>
+          <div class="hm-reward">
+            <div class="hm-reward-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+            <div><div class="hm-reward-label">Twice Yearly Events</div><div class="hm-reward-desc">Spring and autumn events across Yorkshire and North England. Each one different. Each one earned.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hm-waitlist" id="hm-waitlist">
+    <div class="hm-waitlist-inner">
+      <p class="sec-lbl">Be The First To Know</p>
+      <h3 class="hm-waitlist-title">Join the <em>Waitlist</em></h3>
+      <p class="hm-waitlist-body">The Hard Mile community programme launches soon. Drop your email and we'll let you know the moment spots open for the first event. Open to young men aged 16–25 in Yorkshire and North England.</p>
+      <form class="hm-form" id="hmForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+        <input class="hm-input" type="email" name="email" placeholder="Your email address" required autocomplete="email"/>
+        <input type="hidden" name="source" value="The Hard Mile Waitlist"/>
+        <button type="submit" class="hm-submit">Join Waitlist</button>
+      </form>
+      <div class="hm-success" id="hmSuccess">You're on the list. We'll be in touch when spots open — get ready.</div>
+      <p class="hm-note">No spam. No noise. Just one email when the first event goes live.</p>
+    </div>
+  </div>
+
+</section>
+
+<!-- ══ CHALLENGE HISTORY ══ -->
+<section id="history">
+
+  <div class="ch-panel">
+    <div class="ch-hero">
+      <div class="ch-hero-img" style="background-image:url('row-1.jpeg')"></div>
+      <div class="ch-hero-overlay"></div>
+      <div class="ch-hero-content reveal">
+        <div class="ch-year">2025</div>
+        <div class="ch-tag">Challenge I · Spring 2025</div>
+        <h2 class="ch-name">41 Mile <em>Row</em></h2>
+        <div class="ch-who">Mark · Solo Challenge</div>
+        <div class="ch-charity">🏅 In aid of the Charlie Dallas Lancaster Foundation</div>
+      </div>
+    </div>
+    <div class="ch-photos">
+      <div class="ch-photo"><img src="row-1.jpeg" alt="Mark rowing"/></div>
+      <div class="ch-photo"><img src="row-2.jpeg" alt="Mark on the erg"/></div>
+      <div class="ch-photo"><img src="row-3.jpeg" alt="Challenge day"/></div>
+      <div class="ch-photo"><img src="row-4.jpeg" alt="Team support"/></div>
+      <div class="ch-photo"><img src="row-5.jpeg" alt="Finish"/></div>
+    </div>
+    <div class="ch-body-wrap reveal">
+      <p class="ch-body">On raw determination and sheer will, Mark took on a punishing 41-mile rowing challenge that pushed his body and mind to the absolute limit. Hours on the erg, one stroke at a time — proving that the hardest battles are often the ones fought in silence.</p>
+      <div class="ch-stats">
+        <div class="ch-stat"><div class="ch-stat-n">41</div><div class="ch-stat-l">Miles rowed</div></div>
+        <div class="ch-stat"><div class="ch-stat-n">1</div><div class="ch-stat-l">Epic human</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ch-divider"></div>
+
+  <div class="ch-panel">
+    <div class="ch-hero">
+      <div class="ch-hero-img" style="background-image:url('cycle-1.jpeg')"></div>
+      <div class="ch-hero-overlay"></div>
+      <div class="ch-hero-content reveal">
+        <div class="ch-year">2025</div>
+        <div class="ch-tag">Challenge II · Summer 2025</div>
+        <h2 class="ch-name">York to <em>Brighton</em></h2>
+        <div class="ch-who">Ben · Cycle &amp; Run · 500km</div>
+        <div class="ch-charity">🏅 In aid of CDLF &amp; Together for Cinema</div>
+      </div>
+    </div>
+    <div class="ch-photos">
+      <div class="ch-photo"><img src="cycle-1.jpeg" alt="Cycling"/></div>
+      <div class="ch-photo"><img src="cycle-2.jpeg" alt="Ben at Brighton"/></div>
+      <div class="ch-photo"><img src="cycle-3.jpeg" alt="On the route"/></div>
+      <div class="ch-photo"><img src="cycle-4.jpeg" alt="Running section"/></div>
+      <div class="ch-photo"><img src="cycle-5.jpeg" alt="Support crew"/></div>
+    </div>
+    <div class="ch-body-wrap reveal">
+      <p class="ch-body">Ben and team took on an epic 500km journey from York to Brighton — partly by bike, partly on foot — crossing the length of England through every kind of weather and terrain. An extraordinary feat of endurance that laid the foundations for The Hard Mile. This wouldn't have been possible without Mat Cole supporting him throughout the cycle and the rest of the team joining him on the running section.</p>
+      <div class="ch-stats">
+        <div class="ch-stat"><div class="ch-stat-n">500</div><div class="ch-stat-l">Kilometres</div></div>
+        <div class="ch-stat"><div class="ch-stat-n">2</div><div class="ch-stat-l">Disciplines</div></div>
+        <div class="ch-stat"><div class="ch-stat-n">1</div><div class="ch-stat-l">Legend</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ch-divider"></div>
+
+  <div class="ch-panel">
+    <div class="ch-hero">
+      <div class="ch-hero-img" style="background-image:url('hero-run.jpeg');background-position:center 40%"></div>
+      <div class="ch-hero-overlay"></div>
+      <div class="ch-hero-content reveal">
+        <div class="ch-year">2026</div>
+        <div class="ch-tag">Challenge III · Summer 2026 · Live Now</div>
+        <h2 class="ch-name">500K <em>Relay Run</em></h2>
+        <div class="ch-who">The Full Team · Scotland → Thirsk</div>
+        <div class="ch-charity">🏅 Charlie Dallas Lancaster Foundation</div>
+      </div>
+    </div>
+    <div class="ch-body-wrap reveal">
+      <p class="ch-body">For the first time, the whole collective runs together. A relay spanning over 500 kilometres from Scotland to Thirsk — each member carrying the baton across their leg of this monumental journey. The biggest Hard Mile yet — and it's happening right now.</p>
+      <div class="ch-stats">
+        <div class="ch-stat"><div class="ch-stat-n">500+</div><div class="ch-stat-l">Kilometres</div></div>
+        <div class="ch-stat"><div class="ch-stat-n">2</div><div class="ch-stat-l">Countries</div></div>
+        <div class="ch-stat"><div class="ch-stat-n">1</div><div class="ch-stat-l">Team</div></div>
+      </div>
+      <a href="https://www.justgiving.com/page/500kmrun1?utm_medium=FR&utm_source=CL" target="_blank" rel="noopener" class="btn btn-cream">Donate Now</a>
+
+      <!-- ── Meet the Team ── -->
+      <div style="margin-top:4rem;padding-top:4rem;border-top:1px solid var(--line)">
+        <p class="sec-lbl">The Runners</p>
+        <h3 class="sec-title" style="margin-bottom:2rem">Meet the <em>Team</em></h3>
+        <div class="team-grid" style="margin-top:0">
+
+          <div class="team-card reveal">
+            <div class="team-initials">BD</div>
+            <div class="team-name">Ben Davies</div>
+            <div class="team-location">Easingwold</div>
+            <div class="team-role">Local businessman and the driving force behind The Hard Mile. Ben's York to Brighton 500km cycle and run laid the foundations for everything the collective has become.</div>
+          </div>
+
+          <div class="team-card reveal">
+            <div class="team-initials">MC</div>
+            <div class="team-name">Mat Cole</div>
+            <div class="team-location">Yorkshire</div>
+            <div class="team-role">Entrepreneur and executive. Mat supported Ben throughout the entire York to Brighton cycle before taking his place as a key relay runner for the 500K Scotland to Thirsk challenge.</div>
+          </div>
+
+          <div class="team-card reveal">
+            <div class="team-initials">MK</div>
+            <div class="team-name">Mark Karvounis</div>
+            <div class="team-location">Yorkshire</div>
+            <div class="team-role">Business Development Manager and local legend. Mark's solo 41-mile row was the challenge that lit the spark — proving what determination alone can achieve.</div>
+          </div>
+
+          <div class="team-card reveal">
+            <div class="team-initials">AR</div>
+            <div class="team-name">Ashley Rio</div>
+            <div class="team-location">Yorkshire</div>
+            <div class="team-role">Owner of Rio Construction and local personal trainer. Ash brings the physical edge — and the relentless drive to make every team member better than they thought they could be.</div>
+          </div>
+
+          <div class="team-card reveal">
+            <div class="team-initials">DG</div>
+            <div class="team-name">Dave Gill</div>
+            <div class="team-location">Yorkshire</div>
+            <div class="team-role">Regional Director for Scania. Dave brings leadership, logistics and a quiet determination that keeps the team moving when the miles get hard.</div>
+          </div>
+
+          <div class="team-card reveal">
+            <div class="team-initials">CR</div>
+            <div class="team-name">Charlie Richardson</div>
+            <div class="team-location">Thirsk</div>
+            <div class="team-role">Owner of The Greengrocer — a long-established Thirsk business and proud sponsor of the challenge. Charlie represents the community at the heart of why The Hard Mile exists.</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <img src="hardmile-logo.png" alt="The Hard Mile" class="footer-logo"/>
+      <p class="footer-tagline">Pro Aliis Milia Duramus — we endure miles for others.</p>
+    </div>
+    <div class="footer-links">
+      <a href="#challenge">Current Challenge</a>
+      <a href="#sponsors">Our Sponsors</a>
+      <a href="#updates">Video Updates</a>
+      <a href="#community">The Community</a>
+      <a href="#history">Challenge History</a>
+      <a href="https://www.justgiving.com/page/500kmrun1?utm_medium=FR&utm_source=CL" target="_blank" rel="noopener" style="color:var(--gold)">Donate on JustGiving →</a>
+    </div>
+    <div>
+      <p style="font-size:.66rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgba(232,224,208,.3);margin-bottom:.8rem">Get Involved</p>
+      <a href="mailto:hello@thehardmile.com" class="btn btn-cream" style="font-size:.68rem;padding:.7rem 1.4rem">hello@thehardmile.com</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 The Hard Mile · <a href="https://thehardmile.com" target="_blank" rel="noopener">thehardmile.com</a></span>
+    <span>Pro Aliis Milia Duramus</span>
+  </div>
+</footer>
+
+<script>
+// ── Hamburger ──
+const hbg=document.getElementById('hbg'),mob=document.getElementById('mob');
+hbg.addEventListener('click',()=>{const o=hbg.classList.toggle('open');mob.classList.toggle('open',o);hbg.setAttribute('aria-expanded',o)});
+document.querySelectorAll('.mlink,.mcta').forEach(l=>l.addEventListener('click',()=>{hbg.classList.remove('open');mob.classList.remove('open');hbg.setAttribute('aria-expanded','false')}));
+document.addEventListener('click',e=>{if(!hbg.contains(e.target)&&!mob.contains(e.target)){hbg.classList.remove('open');mob.classList.remove('open');hbg.setAttribute('aria-expanded','false')}});
+
+// ── Count-up ──
+function countUp(){
+  const el=document.getElementById('raisedAmount');
+  const target=13445.20,dur=2800,start=performance.now();
+  function step(now){
+    const p=Math.min((now-start)/dur,1),ease=1-Math.pow(1-p,3);
+    el.textContent='£'+(ease*target).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+    if(p<1)requestAnimationFrame(step);else el.textContent='£13,445.20';
+  }
+  requestAnimationFrame(step);
+}
+let counted=false;
+new IntersectionObserver(entries=>{if(entries[0].isIntersecting&&!counted){counted=true;countUp()}},{threshold:0.5}).observe(document.querySelector('.raised-band'));
+
+// ── Waitlist form ──
+const hmForm=document.getElementById('hmForm'),hmSuccess=document.getElementById('hmSuccess');
+if(hmForm){
+  hmForm.addEventListener('submit',async e=>{
+    e.preventDefault();
+    try{
+      const res=await fetch(hmForm.action,{method:'POST',body:new FormData(hmForm),headers:{'Accept':'application/json'}});
+      if(res.ok){hmForm.style.display='none';hmSuccess.style.display='block'}
+      else{alert('Something went wrong — please email hello@thehardmile.com')}
+    }catch{alert('Something went wrong — please email hello@thehardmile.com')}
+  });
+}
+
+// ── Carousel ──
+const track=document.getElementById('carTrack'),outer=document.getElementById('carOuter');
+const dotsEl=document.getElementById('cDots'),prevBtn=document.getElementById('cPrev'),nextBtn=document.getElementById('cNext');
+const cards=track.querySelectorAll('.vid-card');
+let cur=0;
+function visCount(){const w=outer.clientWidth;return w<580?1:w<900?2:3}
+function totalSlides(){return Math.max(1,cards.length-visCount()+1)}
+function buildDots(){
+  dotsEl.innerHTML='';
+  for(let i=0;i<totalSlides();i++){
+    const d=document.createElement('button');
+    d.className='car-dot'+(i===cur?' active':'');
+    d.setAttribute('aria-label','Slide '+(i+1));
+    d.addEventListener('click',()=>goTo(i));
+    dotsEl.appendChild(d);
+  }
+}
+function cardW(){return cards[0]?cards[0].offsetWidth+24:0}
+function goTo(n){
+  const max=totalSlides()-1;cur=Math.max(0,Math.min(n,max));
+  track.style.transform=`translateX(-${cur*cardW()}px)`;
+  prevBtn.disabled=cur===0;nextBtn.disabled=cur>=max;
+  dotsEl.querySelectorAll('.car-dot').forEach((d,i)=>d.classList.toggle('active',i===cur));
+}
+function carMove(dir){goTo(cur+dir)}
+buildDots();goTo(0);
+let sx=0;
+track.addEventListener('touchstart',e=>{sx=e.touches[0].clientX},{passive:true});
+track.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>50)carMove(dx<0?1:-1)},{passive:true});
+window.addEventListener('resize',()=>{buildDots();goTo(Math.min(cur,totalSlides()-1))});
+
+// ══════════════════════════════════
+// SCROLL-DRIVEN ROAD REVEAL ENGINE
+// ══════════════════════════════════
+(function(){
+  const container = document.getElementById('roadSticky');
+  if(!container) return;
+
+  const roadBg     = document.getElementById('roadBg');
+  const roadNudge  = document.getElementById('roadNudge');
+  const roadSvgWrap = document.querySelector('.road-svg-wrap');
+  const svg        = document.getElementById('roadSvg');
+  const roadPath   = document.getElementById('roadPath');
+  const roadLeft   = document.getElementById('roadLeft');
+  const roadRight  = document.getElementById('roadRight');
+  const roadDashes = document.getElementById('roadDashes');
+
+  // Layers
+  const layers = [
+    document.getElementById('rl0'),
+    document.getElementById('rl1'),
+    document.getElementById('rl2'),
+    document.getElementById('rl3'),
+    document.getElementById('rl4'),
+    document.getElementById('rl5'),
+  ];
+
+  // Stat cards — stagger in
+  const statCards = [
+    document.getElementById('rls0'),
+    document.getElementById('rls1'),
+    document.getElementById('rls2'),
+  ];
+
+  // ── Road geometry ──────────────────────────────────
+  // Road converges from wide bottom to vanishing point near centre-top
+  // Matches the perspective road in the Hard Mile logo
+
+  function buildRoadD(progress, vw, vh){
+    // progress 0→1
+    // Vanishing point: horizontally centred, 30% from top
+    const vpx = vw / 2;
+    const vpy = vh * 0.28;
+
+    // Bottom edge — full width, below viewport so road bleeds off
+    const bly = vh + 20;   // bottom-left y
+    const bry = vh + 20;   // bottom-right y
+
+    // How wide the road is at the bottom (fraction of viewport)
+    const roadHalfW = vw * 0.22;
+
+    // The drawn length — progress drives how far up from bottom the path reaches
+    // At progress=0, road tip is AT the bottom (invisible)
+    // At progress=1, road tip is at the vanishing point
+    const tipX = vpx;
+    const tipY = vpy + (bly - vpy) * (1 - progress);
+
+    // Road surface path (trapezoid as cubic bezier for slight curve)
+    const blx = vpx - roadHalfW;
+    const brx = vpx + roadHalfW;
+
+    // Left edge: from tip to bottom-left corner
+    const leftD = `M${tipX},${tipY} Q${vpx - roadHalfW * 0.3},${vh * 0.6} ${blx},${bly}`;
+    // Right edge
+    const rightD = `M${tipX},${tipY} Q${vpx + roadHalfW * 0.3},${vh * 0.6} ${brx},${bly}`;
+    // Road surface (filled path)
+    const surfaceD = `M${tipX},${tipY} Q${vpx - roadHalfW * 0.3},${vh * 0.6} ${blx},${bly} L${brx},${bly} Q${vpx + roadHalfW * 0.3},${vh * 0.6} ${tipX},${tipY} Z`;
+    // Centre dashes
+    const dashD = `M${tipX},${tipY} Q${tipX},${vh * 0.55} ${tipX},${bly}`;
+
+    return { surfaceD, leftD, rightD, dashD };
+  }
+
+  // ── Scroll beats (0–1) at which each layer activates ──
+  // Tight non-overlapping windows — each layer fully hidden before next appears
+  const beats = [
+    { layer: 0, show: 0.00, hide: 0.18 },   // road icon + tagline
+    { layer: 1, show: 0.18, hide: 0.34 },   // pill + eyebrow
+    { layer: 2, show: 0.34, hide: 0.50 },   // big title
+    { layer: 3, show: 0.50, hide: 0.64 },   // route + latin
+    { layer: 4, show: 0.64, hide: 0.78 },   // stats
+    { layer: 5, show: 0.78, hide: 1.01 },   // CTAs — stays to end
+  ];
+
+  // ── Main scroll handler ──────────────────────────────
+  function onScroll(){
+    const scrollEl   = document.documentElement;
+    const containerEl = document.getElementById('challenge');
+    if(!containerEl) return;
+
+    const containerTop    = containerEl.getBoundingClientRect().top + window.scrollY;
+    const containerHeight = containerEl.offsetHeight - window.innerHeight;
+    const scrolled        = window.scrollY - containerTop;
+    const progress        = Math.max(0, Math.min(1, scrolled / containerHeight));
+
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    // ── Draw road ──
+    // Road drawing starts immediately, reaches vanishing point at progress 0.7
+    const roadP = Math.min(1, progress / 0.70);
+    const { surfaceD, leftD, rightD, dashD } = buildRoadD(roadP, vw, vh);
+
+    roadPath.setAttribute('d', surfaceD);
+    roadLeft.setAttribute('d', leftD);
+    roadRight.setAttribute('d', rightD);
+    roadDashes.setAttribute('d', dashD);
+
+    // Road opacity pulses up as it draws
+    roadPath.style.opacity  = 0.06 + roadP * 0.10;
+    roadLeft.style.opacity  = roadP * 0.25;
+    roadRight.style.opacity = roadP * 0.25;
+    roadDashes.style.opacity = Math.min(1, roadP * 1.4);
+
+    // ── Show SVG road only after opening icon frame (beat 0.18+) ──
+    if(roadSvgWrap) roadSvgWrap.classList.toggle('road-visible', progress >= 0.18);
+
+    // ── Background photo fades in from beat 0.40 ──
+    const bgOpacity = Math.max(0, Math.min(1, (progress - 0.38) / 0.20));
+    roadBg.style.opacity = bgOpacity;
+
+    // ── Scroll nudge fades out after first beat ──
+    roadNudge.style.opacity = Math.max(0, 1 - progress * 8);
+
+    // ── Layer visibility ──
+    beats.forEach(b => {
+      const el = layers[b.layer];
+      if(!el) return;
+      const inView = progress >= b.show && progress < b.hide;
+      el.classList.toggle('visible', inView);
+    });
+
+    // ── Stat cards stagger in when layer 4 visible ──
+    const statsVisible = progress >= beats[4].show && progress < beats[4].hide;
+    statCards.forEach((card, i) => {
+      if(!card) return;
+      setTimeout(() => {
+        card.classList.toggle('vis', statsVisible);
+      }, i * 120);
+    });
+  }
+
+  // ── Init ──────────────────────────────────────────
+  // Show layer 0 immediately
+  if(layers[0]) layers[0].classList.add('visible');
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+  onScroll(); // run once on load
+})();
+
+// ── Scroll reveal ──
+const io=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');io.unobserve(e.target)}})},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
