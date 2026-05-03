@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+  <title>500K Challenge — The Hard Mile</title>
+  <script src="faces.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Oswald:wght@700&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{--black:#0a0a0a;--cream:#e8e0d0;--gold:#c9a84c;--or:#e8821a}
+    html,body{width:100%;height:100%;background:var(--black);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;font-family:'Press Start 2P',monospace;overflow:hidden;touch-action:none;overscroll-behavior:none}
+    #gameWrap{position:relative;width:100%;max-width:800px;flex-shrink:0}
+    #titleBar{background:var(--black);border-bottom:2px solid var(--gold);padding:.5rem .8rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.3rem}
+    #titleBar .logo{font-family:'Oswald',sans-serif;font-size:clamp(.7rem,.9rem,1rem);font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--cream)}
+    #titleBar .logo em{color:var(--gold);font-style:normal}
+    #hud{display:flex;gap:.6rem;font-size:clamp(.3rem,.38rem,.42rem);color:var(--cream);align-items:center;flex-wrap:wrap}
+    #hud span{color:var(--gold)}
+    canvas{display:block;width:100%;image-rendering:pixelated;image-rendering:crisp-edges;cursor:pointer;touch-action:none}
+    #jumpBtn{display:none;width:100%;background:rgba(201,168,76,.12);border:none;border-top:2px solid rgba(201,168,76,.3);color:var(--gold);font-family:'Press Start 2P',monospace;font-size:clamp(.5rem,.6rem,.7rem);padding:.7rem;letter-spacing:.1em;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+    #jumpBtn:active{background:rgba(201,168,76,.25)}
+    @media(max-width:600px),(pointer:coarse){#jumpBtn{display:block}}
+    .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(10,10,10,.92);gap:.8rem;z-index:10;padding:.8rem;overflow-y:auto}
+    .overlay.hidden{display:none}
+    .pixel-title{font-size:clamp(.7rem,2.5vw,1.3rem);color:var(--gold);text-align:center;line-height:1.8;text-shadow:2px 2px 0 #000}
+    .pixel-sub{font-size:clamp(.35rem,1.2vw,.58rem);color:var(--cream);text-align:center;line-height:2;opacity:.85}
+    .pixel-btn{background:var(--gold);color:var(--black);font-family:'Press Start 2P',monospace;font-size:clamp(.42rem,1.4vw,.65rem);padding:.7rem 1.5rem;border:none;cursor:pointer;border-bottom:4px solid #8a6a1a;border-right:4px solid #8a6a1a;transition:transform .1s;letter-spacing:.06em;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+    .pixel-btn:active{transform:translate(2px,2px);border-bottom-width:2px;border-right-width:2px}
+    .char-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;width:100%;max-width:320px;padding:0 .5rem}
+    @media(min-width:500px){.char-grid{grid-template-columns:repeat(5,1fr);max-width:420px}}
+    .char-card{display:flex;flex-direction:column;align-items:center;gap:.35rem;cursor:pointer;transition:transform .15s;touch-action:manipulation}
+    .char-card:active{transform:scale(0.95)}
+    .char-face{width:clamp(44px,10vw,58px);height:clamp(44px,10vw,58px);border-radius:50%;border:2px solid var(--gold);overflow:hidden;background:#111}
+    .char-face img{width:100%;height:100%;object-fit:cover;object-position:center 10%}
+    .char-face.tbc{display:flex;align-items:center;justify-content:center;font-size:.5rem;color:rgba(232,224,208,.3);border-style:dashed;border-color:rgba(232,224,208,.2)}
+    .char-name{font-size:clamp(.26rem,.32rem,.36rem);color:var(--cream);text-align:center;line-height:1.6}
+    .char-name em{color:var(--gold);font-style:normal;display:block}
+    .char-card.selected .char-face{border-color:#fff;box-shadow:0 0 0 2px var(--gold)}
+    #donatePrompt{background:linear-gradient(135deg,#1a1608,#0f0e0a);border:2px solid var(--gold);padding:1.2rem;text-align:center;max-width:300px;width:100%}
+    #donatePrompt p{font-size:clamp(.32rem,.38rem,.42rem);color:var(--cream);line-height:2;margin:.5rem 0}
+    #donatePrompt a{display:inline-block;background:var(--or);color:#fff;font-family:'Press Start 2P',monospace;font-size:clamp(.35rem,.42rem,.48rem);padding:.55rem .9rem;text-decoration:none;border-bottom:3px solid #c96d10;margin-top:.4rem}
+    .name-entry{display:flex;flex-direction:column;align-items:center;gap:.7rem;background:rgba(10,10,10,.9);border:2px solid var(--gold);padding:1.2rem 1.5rem;width:100%;max-width:280px}
+    .name-entry label{font-size:clamp(.36rem,.42rem,.48rem);color:var(--cream);letter-spacing:.1em}
+    .name-input{background:#111;border:2px solid var(--gold);color:var(--gold);font-family:'Press Start 2P',monospace;font-size:clamp(.48rem,.56rem,.62rem);padding:.5rem .7rem;text-align:center;text-transform:uppercase;width:100%;outline:none;letter-spacing:.1em}
+    .name-input:focus{border-color:#fff}
+    .comp-notice{background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.3);padding:.7rem 1rem;max-width:280px;width:100%;text-align:center}
+    .comp-notice p{font-size:clamp(.3rem,.36rem,.4rem);color:var(--gold);line-height:2}
+    .leaderboard{background:rgba(10,10,10,.85);border:2px solid rgba(201,168,76,.4);padding:.9rem 1.2rem;width:100%;max-width:280px}
+    .lb-title{font-size:clamp(.38rem,.46rem,.52rem);color:var(--gold);letter-spacing:.15em;text-align:center;margin-bottom:.7rem;border-bottom:1px solid rgba(201,168,76,.3);padding-bottom:.5rem}
+    .lb-row{display:flex;align-items:center;gap:.5rem;padding:.3rem 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:clamp(.3rem,.36rem,.42rem)}
+    .lb-row:last-child{border-bottom:none}
+    .lb-pos{width:1.2rem;text-align:center;font-size:.55rem}
+    .lb-pos.gold{color:#ffd700}.lb-pos.silver{color:#c0c0c0}.lb-pos.bronze{color:#cd7f32}
+    .lb-name{flex:1;color:var(--cream);letter-spacing:.06em;text-transform:uppercase;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+    .lb-score{color:var(--gold);letter-spacing:.05em;white-space:nowrap}
+    .lb-char{color:rgba(232,224,208,.35);font-size:.3rem;white-space:nowrap}
+    .lb-empty{color:rgba(232,224,208,.25);font-size:.38rem;text-align:center;padding:.4rem 0;line-height:2}
+    .lb-row.new-score .lb-name{color:var(--gold)}
+    .lb-row.new-score{background:rgba(201,168,76,.08)}
+  </style>
+</head>
+<body>
+<div id="gameWrap">
+  <div id="titleBar">
+    <div class="logo">The Hard <em>Mile</em></div>
+    <div id="hud">KM:<span id="hudKm">0</span> PTS:<span id="hudPts">0</span> ❤:<span id="hudLives">3</span> HI:<span id="hudHi">0</span></div>
+  </div>
+  <canvas id="gameCanvas" width="800" height="300"></canvas>
+  <button id="jumpBtn" ontouchstart="jumpBtnPress(event)" onmousedown="jumpBtnPress(event)">▲ TAP TO JUMP</button>
+
+  <!-- START -->
+  <div class="overlay" id="startScreen">
+    <div class="pixel-title">500K CHALLENGE</div>
+    <div class="pixel-sub">Pick your runner · Tap/Space to jump · Collect ⭐ for bonus points!</div>
+    <div class="comp-notice"><p>🏆 COMPETITION 🏆<br>Highest score by 5th July<br>wins £50!<br>Collect stars to score big!</p></div>
+    <div class="char-grid" id="charGrid">
+      <div class="char-card selected" data-name="Mark" data-color="#e8821a" onclick="selectChar(this)">
+        <div class="char-face"><img src="face-mark.png" alt="Mark" crossorigin="anonymous"/></div>
+        <div class="char-name"><em>MARK</em>Thirsk</div>
+      </div>
+      <div class="char-card" data-name="Ben" data-color="#c9a84c" onclick="selectChar(this)">
+        <div class="char-face"><img src="face-ben.png" alt="Ben" crossorigin="anonymous"/></div>
+        <div class="char-name"><em>BEN</em>Easingwold</div>
+      </div>
+      <div class="char-card" data-name="Ash" data-color="#4ac97a" onclick="selectChar(this)">
+        <div class="char-face"><img src="face-ash.png" alt="Ash" crossorigin="anonymous"/></div>
+        <div class="char-name"><em>ASH</em>Thirsk</div>
+      </div>
+      <div class="char-card" data-name="Mat" data-color="#ff69b4" onclick="selectChar(this)">
+        <div class="char-face"><img src="face-mat.png" alt="Mat" crossorigin="anonymous"/></div>
+        <div class="char-name"><em>MAT</em>Thirsk</div>
+      </div>
+      <div class="char-card" data-name="Charlie" data-color="#4a8fc9" onclick="selectChar(this)">
+        <div class="char-face"><img src="face-charlie.png" alt="Charlie" crossorigin="anonymous"/></div>
+        <div class="char-name"><em>CHARLIE</em>Thirsk</div>
+      </div>
+    </div>
+    <div class="leaderboard"><div class="lb-title">🏆 TOP 3</div><div id="startLbRows"><div class="lb-empty">No scores yet!</div></div></div>
+    <button class="pixel-btn" onclick="startGame()">▶ START RUNNING</button>
+  </div>
+
+  <!-- NAME ENTRY -->
+  <div class="overlay hidden" id="nameScreen">
+    <div class="pixel-title" id="nameTitle">GAME OVER</div>
+    <div class="pixel-sub" id="nameSubMsg"></div>
+    <div class="name-entry">
+      <label>YOUR NAME</label>
+      <input class="name-input" id="nameInput" type="text" maxlength="12" placeholder="YOUR NAME" autocomplete="off" spellcheck="false"/>
+      <button class="pixel-btn" onclick="submitScore()">✓ SUBMIT</button>
+    </div>
+  </div>
+
+  <!-- GAME OVER -->
+  <div class="overlay hidden" id="gameOverScreen">
+    <div class="pixel-title" style="color:#c94a4a">GAME OVER</div>
+    <div class="pixel-sub" id="gameOverMsg"></div>
+    <div class="leaderboard"><div class="lb-title">🏆 TOP 3</div><div id="gameOverLbRows"></div></div>
+    <button class="pixel-btn" onclick="restartGame()">↺ TRY AGAIN</button>
+  </div>
+
+  <!-- WIN -->
+  <div class="overlay hidden" id="winScreen">
+    <div class="pixel-title" style="color:var(--gold)">THIRSK! 🏆</div>
+    <div class="pixel-sub">500KM COMPLETE!</div>
+    <div class="leaderboard"><div class="lb-title">🏆 TOP 3</div><div id="winLbRows"></div></div>
+    <div id="donatePrompt">
+      <div class="pixel-title" style="font-size:.7rem;color:var(--gold)">NOW MAKE IT REAL</div>
+      <p>The real team run 500km for the Charlie Dallas Lancaster Foundation.</p>
+      <a href="https://www.justgiving.com/page/500kmrun1?utm_medium=FR&utm_source=CL" target="_blank">DONATE NOW →</a>
+    </div>
+    <button class="pixel-btn" onclick="restartGame()">↺ PLAY AGAIN</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+// ══════════════════════════════
+// THE HARD MILE — 500K GAME
+// Clean build — all 5 runners
+// ══════════════════════════════
+
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const W = 800, H = 300;
+canvas.width = W; canvas.height = H;
+
+function resizeCanvas(){
+  const w = document.getElementById('gameWrap').clientWidth;
+  canvas.style.width = w + 'px';
+  canvas.style.height = Math.round(w * H / W) + 'px';
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function jumpBtnPress(e){ e.preventDefault(); jump(); }
+
+// ── Load face images from embedded data ──
+const FACES = {};
+function loadFaces(){
+  const data = window.FACE_DATA || {};
+  ['mark','ben','ash','mat','charlie'].forEach(name => {
+    const img = new Image();
+    if(data[name]){
+      img.src = data[name];
+    } else {
+      // fallback to file (works when opened directly)
+      img.crossOrigin = 'anonymous';
+      img.src = `face-${name}.png`;
+    }
+    FACES[name] = img;
+  });
+}
+loadFaces();
+
+// ── Leaderboard ──
+const LB_KEY = 'hardmile_lb_v2';
+function getLb(){ try{ return JSON.parse(localStorage.getItem(LB_KEY)||'[]'); }catch(e){ return []; } }
+function saveLb(name, pts, km, charName){
+  const lb = getLb();
+  lb.push({ name:name.toUpperCase().substring(0,12), pts:Math.floor(pts), km:Math.floor(km), char:charName });
+  lb.sort((a,b)=>b.pts-a.pts);
+  try{ localStorage.setItem(LB_KEY, JSON.stringify(lb.slice(0,10))); }catch(e){}
+  return lb;
+}
+function renderLb(el, highlightName){
+  const top = getLb().slice(0,3);
+  const medals = ['🥇','🥈','🥉'], cls = ['gold','silver','bronze'];
+  if(!top.length){ el.innerHTML='<div class="lb-empty">No scores yet!</div>'; return; }
+  el.innerHTML = top.map((e,i)=>{
+    const isNew = highlightName && e.name===highlightName.toUpperCase();
+    return `<div class="lb-row${isNew?' new-score':''}">
+      <span class="lb-pos ${cls[i]}">${medals[i]}</span>
+      <span class="lb-name">${e.name}</span>
+      <span class="lb-char">${e.char}</span>
+      <span class="lb-score">${e.pts}pts</span>
+    </div>`;
+  }).join('');
+}
+
+// ── State ──
+const GROUND = H - 58;
+let state='select', animId=null, frameCount=0;
+let score=0, points=0, hiPts=0, lives=3, speed=0;
+let invincible=0, obsCooldown=60, powerupCooldown=200;
+let milestoneMsg=null, milestoneFade=0;
+let pendingPts=0, pendingKm=0, pendingChar='';
+const shownMilestones = new Set();
+
+let selectedChar = { name:'Mark', color:'#e8821a' };
+
+const char = { x:90, y:GROUND, w:40, h:68, vy:0, jumping:false, doubleJump:false };
+const GRAVITY=0.72, JUMP=-13.5;
+
+let obstacles=[], powerups=[];
+
+// ── Obstacle types ──
+const OBS = [
+  {e:'🐑',w:52,h:44},{e:'🐑',w:68,h:44},{e:'⛺',w:52,h:56},
+  {e:'🚧',w:42,h:64},{e:'💧',w:30,h:34},{e:'🌬',w:42,h:50},
+  {e:'🧱',w:38,h:70},{e:'🐄',w:65,h:52},{e:'🏔',w:58,h:74},{e:'🛑',w:34,h:62}
+];
+
+// ── Milestones ──
+const MILESTONES=[
+  {km:50,msg:'Leaving Scotland!',color:'#4a8fc9'},
+  {km:150,msg:'Border crossed!',color:'#c9a84c'},
+  {km:250,msg:'Halfway!',color:'#e8821a'},
+  {km:350,msg:'Yorkshire!',color:'#4ac97a'},
+  {km:450,msg:'Nearly there!',color:'#c9a84c'},
+];
+
+// ── Input ──
+function jump(){
+  if(state!=='playing') return;
+  if(!char.jumping){ char.vy=JUMP; char.jumping=true; char.doubleJump=true; }
+  else if(char.doubleJump){ char.vy=JUMP*.82; char.doubleJump=false; }
+}
+document.addEventListener('keydown',e=>{ if(e.code==='Space'||e.code==='ArrowUp'){e.preventDefault();jump();} });
+canvas.addEventListener('pointerdown',e=>{ e.preventDefault(); jump(); },{passive:false});
+
+// ── Character select ──
+function selectChar(el){
+  document.querySelectorAll('.char-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedChar = { name:el.dataset.name, color:el.dataset.color };
+}
+
+// ── Start / Reset ──
+function startGame(){
+  document.getElementById('startScreen').classList.add('hidden');
+  reset(); state='playing'; loop();
+}
+function restartGame(){
+  ['gameOverScreen','winScreen','nameScreen'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+  renderLb(document.getElementById('startLbRows'),null);
+  reset(); state='playing'; loop();
+}
+function reset(){
+  score=0; points=0; lives=3; speed=4.5; frameCount=0;
+  obstacles=[]; powerups=[];
+  obsCooldown=65; powerupCooldown=180;
+  char.y=GROUND; char.vy=0; char.jumping=false; char.doubleJump=false;
+  invincible=0; shownMilestones.clear();
+  milestoneMsg=null; milestoneFade=0;
+  if(animId){ cancelAnimationFrame(animId); animId=null; }
+}
+
+// ── Sky / ground by km ──
+function skyGrad(km){
+  const pairs=[
+    [0,'#0f1828','#1a2a4a'],[80,'#1a2838','#2a3a5a'],
+    [180,'#283248','#3a4a6a'],[290,'#602010','#c06030'],
+    [380,'#0f1820','#1a2a3a'],[460,'#050510','#0a0a1a']
+  ];
+  for(let i=pairs.length-1;i>=0;i--){ if(km>=pairs[i][0]){ const g=ctx.createLinearGradient(0,0,0,H-58); g.addColorStop(0,pairs[i][1]); g.addColorStop(1,pairs[i][2]); return g; } }
+  return '#0f1828';
+}
+function groundCol(km){
+  if(km<80) return '#2d4a2a';
+  if(km<200) return '#3a3a3a';
+  if(km<350) return '#4a3a2a';
+  return '#2a3020';
+}
+
+// ── Draw background ──
+function drawBg(){
+  ctx.fillStyle = skyGrad(score);
+  ctx.fillRect(0,0,W,H-58);
+  // Stars
+  if(score<60||score>420){
+    ctx.fillStyle='rgba(255,255,255,.6)';
+    for(let i=0;i<25;i++){
+      const sx=(i*137+frameCount*.2)%W, sy=(i*71)%(H-100);
+      ctx.fillRect(Math.floor(sx),Math.floor(sy),1+(i%2),1);
+    }
+  }
+  // Hills
+  ctx.fillStyle = score<150?'#1a3a1a':(score<350?'#2a2a3a':'#1a2a1a');
+  const mOff=(frameCount*.9)%280;
+  for(let i=0;i<4;i++){
+    const mx=(i*280-mOff+W*2)%(W+280)-140, mh=55+(i%3)*28;
+    ctx.beginPath(); ctx.moveTo(mx,H-58); ctx.lineTo(mx+140,H-58-mh); ctx.lineTo(mx+280,H-58); ctx.fill();
+  }
+  // Ground
+  ctx.fillStyle=groundCol(score); ctx.fillRect(0,H-58,W,58);
+  ctx.fillStyle='#3a3632'; ctx.fillRect(0,H-42,W,42);
+  // Road dashes
+  ctx.fillStyle='rgba(232,224,208,.38)';
+  const dash=(frameCount*speed)%60;
+  for(let x=-60;x<W+60;x+=60) ctx.fillRect(x-dash,H-24,36,4);
+  ctx.fillStyle='rgba(232,224,208,.5)';
+  ctx.fillRect(0,H-58,W,4); ctx.fillRect(0,H-14,W,3);
+}
+
+// ── Draw runner ──
+function drawRunner(){
+  const {x,y,w} = char;
+  const bounce = (state==='playing'&&!char.jumping) ? Math.sin(frameCount*.3)*2 : 0;
+  const col = selectedChar.color||'#e8821a';
+  const lp = frameCount*.25;
+  const wobble = (!char.jumping&&state==='playing') ? Math.sin(frameCount*.28)*2.5 : 0;
+
+  // Torso
+  ctx.fillStyle=col; ctx.fillRect(x+8,y+34+bounce,24,20);
+  // Arms
+  const as=Math.sin(lp)*9;
+  ctx.fillRect(x-2,y+36+bounce+as,10,15); ctx.fillRect(x+32,y+36+bounce-as,10,15);
+  // Legs
+  const fo=Math.sin(lp)*9;
+  ctx.fillStyle='#111';
+  ctx.fillRect(x+9,y+52+bounce,10,14); ctx.fillRect(x+21,y+52+bounce,10,14);
+  ctx.fillStyle=col;
+  ctx.fillRect(x+5,y+62+bounce+fo,14,7); ctx.fillRect(x+21,y+62+bounce-fo,14,7);
+
+  // Big head — transparent PNG
+  const headW=80;
+  const faceImg = FACES[selectedChar.name.toLowerCase()];
+  const aspect = (faceImg&&faceImg.naturalWidth>0) ? faceImg.naturalHeight/faceImg.naturalWidth : 1.4;
+  const headH = Math.round(headW*aspect);
+  const hx = x+w/2-headW/2+wobble;
+  const hy = y-headH+44+bounce;
+
+  if(faceImg&&faceImg.complete&&faceImg.naturalWidth>0){
+    ctx.drawImage(faceImg,hx,hy,headW,headH);
+  } else {
+    ctx.fillStyle='#f4c08a'; ctx.fillRect(hx,hy,headW,headW);
+    ctx.fillStyle='#333';
+    ctx.fillRect(hx+14,hy+22,10,10); ctx.fillRect(hx+38,hy+22,10,10);
+    ctx.fillRect(hx+18,hy+42,20,6);
+  }
+
+  // Name
+  ctx.font="7px 'Press Start 2P'";
+  ctx.fillStyle='#000'; ctx.fillText(selectedChar.name,x+2,hy-3+bounce);
+  ctx.fillStyle='#fff'; ctx.fillText(selectedChar.name,x,hy-5+bounce);
+
+  // Hit flash
+  if(invincible>0&&frameCount%4<2){
+    ctx.save(); ctx.globalAlpha=.3; ctx.fillStyle='#f00';
+    ctx.fillRect(x-4,hy-4,headW+16,headH+50); ctx.restore();
+  }
+}
+
+// ── Draw obstacles ──
+function drawObstacle(o){
+  ctx.fillStyle='rgba(0,0,0,.25)';
+  ctx.fillRect(o.x+o.w*.1,GROUND+o.h-4,o.w*.8,5);
+  ctx.fillStyle=o.col||'#888';
+  ctx.fillRect(o.x,o.y,o.w,o.h);
+  ctx.font=`${Math.min(o.w,o.h)-6}px serif`;
+  ctx.fillText(o.e,o.x+2,o.y+o.h-5);
+}
+
+// ── Draw powerups (stars) ──
+function drawPowerup(p){
+  const pulse = 1+Math.sin(frameCount*.15)*.15;
+  ctx.save();
+  ctx.translate(p.x+p.w/2, p.y+p.h/2);
+  ctx.scale(pulse,pulse);
+  ctx.font=`${p.w}px serif`;
+  ctx.fillText('⭐',-p.w/2,-p.h/2+p.w*.8);
+  ctx.restore();
+  // Glow
+  ctx.shadowColor='#ffd700'; ctx.shadowBlur=12;
+  ctx.shadowBlur=0;
+}
+
+// ── HUD overlay ──
+function drawHUD(){
+  // Progress bar
+  const pct=Math.min(score/500,1);
+  ctx.fillStyle='#222'; ctx.fillRect(10,8,W-20,8);
+  ctx.fillStyle=selectedChar.color||'#e8821a'; ctx.fillRect(10,8,(W-20)*pct,8);
+  ctx.font="6px 'Press Start 2P'";
+  ctx.fillStyle='#666'; ctx.fillText('BALLATER',10,24); ctx.fillText('THIRSK',W-52,24);
+
+  // Lives
+  ctx.font='13px serif';
+  for(let i=0;i<lives;i++) ctx.fillText('❤',10+i*18,H-4);
+
+  // Points popup
+  if(milestoneMsg&&milestoneFade>0){
+    ctx.globalAlpha=Math.min(1,milestoneFade/30);
+    const mw=250,mh=34,mx=W/2-mw/2,my=H/2-55;
+    ctx.fillStyle='rgba(10,10,10,.9)'; ctx.fillRect(mx,my,mw,mh);
+    ctx.strokeStyle=milestoneMsg.color; ctx.lineWidth=2; ctx.strokeRect(mx,my,mw,mh);
+    ctx.font="9px 'Press Start 2P'"; ctx.fillStyle=milestoneMsg.color;
+    ctx.fillText(milestoneMsg.msg,mx+8,my+22);
+    ctx.globalAlpha=1; milestoneFade--;
+  }
+}
+
+// ── Collision ──
+function hits(a,b){
+  return !(a.x+a.w-8<b.x+4||a.x+8>b.x+b.w-4||a.y+a.h-8<b.y+4||a.y+8>b.y+b.h-4);
+}
+
+// ── Update ──
+function update(){
+  if(state!=='playing') return;
+  frameCount++;
+
+  // Speed ramp — gentler, plateaus at ~9
+  speed = 4.5 + Math.min(score/70, 4.5);
+
+  // Distance
+  score += speed*.013;
+  score = Math.min(score,500);
+
+  // Points — base from distance
+  points += speed*.02;
+
+  document.getElementById('hudKm').textContent = Math.floor(score);
+  document.getElementById('hudPts').textContent = Math.floor(points);
+  document.getElementById('hudLives').textContent = lives;
+
+  // Milestones
+  MILESTONES.forEach(m=>{
+    if(!shownMilestones.has(m.km)&&score>=m.km){
+      shownMilestones.add(m.km);
+      milestoneMsg=m; milestoneFade=90;
+    }
+  });
+
+  // Gravity
+  char.vy+=GRAVITY; char.y+=char.vy;
+  if(char.y>=GROUND){ char.y=GROUND; char.vy=0; char.jumping=false; char.doubleJump=false; }
+
+  // No double jump after 200km
+  if(score>200) char.doubleJump=false;
+
+  if(invincible>0) invincible--;
+
+  // Spawn obstacles
+  obsCooldown--;
+  if(obsCooldown<=0){
+    const t=OBS[Math.floor(Math.random()*OBS.length)];
+    obstacles.push({x:W+20,y:GROUND+char.h-t.h,w:t.w,h:t.h,e:t.e});
+    // Double obstacle after 150km, 28% chance
+    if(score>150&&Math.random()<.28){
+      const t2=OBS[Math.floor(Math.random()*OBS.length)];
+      obstacles.push({x:W+20+t.w+58,y:GROUND+char.h-t2.h,w:t2.w,h:t2.h,e:t2.e});
+    }
+    obsCooldown = Math.max(30,90-Math.floor(score/6))+Math.floor(Math.random()*Math.max(18,50-score/10));
+  }
+
+  // Spawn powerup stars
+  powerupCooldown--;
+  if(powerupCooldown<=0){
+    const starH=28, starW=28;
+    // Spawn at jump height so player must jump to collect
+    const jumpH = GROUND - 90 - Math.floor(Math.random()*40);
+    powerups.push({x:W+20, y:jumpH, w:starW, h:starH});
+    powerupCooldown = 160+Math.floor(Math.random()*120);
+  }
+
+  // Move obstacles
+  for(let i=obstacles.length-1;i>=0;i--){
+    obstacles[i].x-=speed;
+    if(obstacles[i].x+obstacles[i].w<-20){ obstacles.splice(i,1); continue; }
+    if(invincible===0&&hits(char,obstacles[i])){
+      lives--; invincible=90; obstacles.splice(i,1);
+      if(lives<=0){ state='dead'; setTimeout(showGameOver,400); return; }
+    }
+  }
+
+  // Move powerups
+  for(let i=powerups.length-1;i>=0;i--){
+    powerups[i].x-=speed;
+    if(powerups[i].x+powerups[i].w<-20){ powerups.splice(i,1); continue; }
+    if(hits(char,powerups[i])){
+      // Bonus points for collecting star!
+      const bonus = 50+Math.floor(score/10);
+      points+=bonus;
+      milestoneMsg={msg:`+${bonus} STAR BONUS!`,color:'#ffd700'};
+      milestoneFade=70;
+      powerups.splice(i,1);
+    }
+  }
+
+  // Win
+  if(score>=499.5){
+    score=500; state='win';
+    if(points>hiPts) hiPts=Math.floor(points);
+    document.getElementById('hudHi').textContent=hiPts;
+    cancelAnimationFrame(animId);
+    setTimeout(()=>showNameEntry(true),400);
+  }
+}
+
+// ── Draw ──
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  drawBg();
+  powerups.forEach(drawPowerup);
+  obstacles.forEach(drawObstacle);
+  drawRunner();
+  drawHUD();
+}
+
+// ── Game over / win ──
+function showGameOver(){
+  if(Math.floor(points)>hiPts) hiPts=Math.floor(points);
+  document.getElementById('hudHi').textContent=hiPts;
+  cancelAnimationFrame(animId);
+  showNameEntry(false);
+}
+
+function showNameEntry(isWin){
+  pendingPts=points; pendingKm=score; pendingChar=selectedChar.name;
+  document.getElementById('nameTitle').textContent = isWin?'YOU MADE IT! 🏆':'GAME OVER';
+  document.getElementById('nameTitle').style.color = isWin?'var(--gold)':'#c94a4a';
+  document.getElementById('nameSubMsg').textContent =
+    `${selectedChar.name} · ${Math.floor(score)}km · ${Math.floor(points)}pts`;
+  document.getElementById('nameInput').value='';
+  document.getElementById('nameScreen').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('nameInput').focus(),100);
+}
+
+function submitScore(){
+  const name = document.getElementById('nameInput').value.trim()||'RUNNER';
+  document.getElementById('nameScreen').classList.add('hidden');
+  saveLb(name,pendingPts,pendingKm,pendingChar);
+  if(state==='win'){
+    renderLb(document.getElementById('winLbRows'),name);
+    document.getElementById('winScreen').classList.remove('hidden');
+  } else {
+    document.getElementById('gameOverMsg').textContent =
+      `${selectedChar.name} · ${Math.floor(pendingKm)}km · ${Math.floor(pendingPts)}pts`;
+    renderLb(document.getElementById('gameOverLbRows'),name);
+    document.getElementById('gameOverScreen').classList.remove('hidden');
+  }
+}
+
+document.getElementById('nameInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){e.preventDefault();submitScore();}
+});
+
+// ── Main loop ──
+function loop(){
+  update(); draw();
+  if(state==='playing') animId=requestAnimationFrame(loop);
+}
+
+// ── Init — populate char card faces from data ──
+(function(){
+  const fd = window.FACE_DATA||{};
+  document.querySelectorAll('.char-face img').forEach(img=>{
+    const name = img.alt.toLowerCase();
+    if(fd[name]) img.src = fd[name];
+  });
+})();
+renderLb(document.getElementById('startLbRows'),null);
+(function initDraw(){
+  const g=ctx.createLinearGradient(0,0,0,H-58);
+  g.addColorStop(0,'#0f1828'); g.addColorStop(1,'#1a2a4a');
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H-58);
+  ctx.fillStyle='#2d4a2a'; ctx.fillRect(0,H-58,W,58);
+  ctx.fillStyle='#3a3632'; ctx.fillRect(0,H-42,W,42);
+})();
+</script>
+</body>
+</html>
