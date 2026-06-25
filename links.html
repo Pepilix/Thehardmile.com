@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Hard Mile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;600;700&family=Lora:ital@0;1&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+    :root{
+      --black:  #0a0a0a;
+      --black2: #111111;
+      --cream:  #e8e0d0;
+      --cream-d:#b8b2a8;
+      --gold:   #c9a84c;
+      --gold-l: #e8c97a;
+      --line:   rgba(232,224,208,0.1);
+    }
+
+    html,body{
+      min-height:100%;
+      background:var(--black);
+      color:var(--cream);
+      font-family:'DM Sans',sans-serif;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    /* subtle diagonal texture */
+    body::before{
+      content:'';
+      position:fixed;inset:0;
+      background:repeating-linear-gradient(
+        -55deg,
+        transparent,transparent 40px,
+        rgba(232,224,208,.012) 40px,rgba(232,224,208,.012) 41px
+      );
+      pointer-events:none;z-index:0;
+    }
+
+    /* Road glow at top */
+    body::after{
+      content:'';
+      position:fixed;top:0;left:50%;transform:translateX(-50%);
+      width:300px;height:2px;
+      background:linear-gradient(to right,transparent,var(--gold),transparent);
+      opacity:.6;z-index:0;
+    }
+
+    .page{
+      position:relative;z-index:1;
+      width:100%;max-width:420px;
+      padding:2.5rem 1.5rem 3rem;
+      display:flex;flex-direction:column;
+      align-items:center;gap:0;
+    }
+
+    /* ── Logo ── */
+    .logo-wrap{
+      margin-bottom:1.6rem;
+      animation:fadeDown .6s ease both;
+    }
+    .logo-wrap img{
+      width:110px;height:110px;
+      object-fit:contain;
+      filter:drop-shadow(0 4px 24px rgba(0,0,0,.9));
+    }
+
+    /* ── Name ── */
+    .name{
+      font-family:'Oswald',sans-serif;
+      font-size:1.55rem;font-weight:700;
+      letter-spacing:.12em;text-transform:uppercase;
+      color:var(--cream);
+      animation:fadeDown .6s .08s ease both;
+      text-align:center;line-height:1;
+      margin-bottom:.4rem;
+    }
+
+    .latin{
+      font-family:'Lora',serif;font-style:italic;
+      font-size:.72rem;color:rgba(232,224,208,.38);
+      letter-spacing:.12em;
+      animation:fadeDown .6s .12s ease both;
+      text-align:center;margin-bottom:.5rem;
+    }
+
+    .tagline{
+      font-size:.68rem;font-weight:600;
+      letter-spacing:.22em;text-transform:uppercase;
+      color:var(--gold);
+      animation:fadeDown .6s .16s ease both;
+      text-align:center;margin-bottom:2.2rem;
+    }
+
+    /* ── Divider ── */
+    .divider{
+      width:100%;height:1px;
+      background:linear-gradient(to right,transparent,var(--line),transparent);
+      margin-bottom:1.8rem;
+      animation:fadeDown .6s .2s ease both;
+    }
+
+    /* ── Links ── */
+    .links{
+      width:100%;
+      display:flex;flex-direction:column;
+      gap:.85rem;
+    }
+
+    .link-btn{
+      display:flex;align-items:center;
+      width:100%;
+      text-decoration:none;
+      border-radius:3px;
+      padding:1rem 1.4rem;
+      gap:1rem;
+      position:relative;overflow:hidden;
+      transition:transform .2s ease, box-shadow .2s ease;
+      animation:fadeUp .5s ease both;
+    }
+    .link-btn:hover{
+      transform:translateY(-2px);
+    }
+    .link-btn:active{
+      transform:translateY(0) scale(.98);
+    }
+
+    /* Shimmer on hover */
+    .link-btn::after{
+      content:'';
+      position:absolute;inset:0;
+      background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.06) 50%,transparent 100%);
+      transform:translateX(-100%);
+      transition:transform .4s ease;
+    }
+    .link-btn:hover::after{ transform:translateX(100%); }
+
+    /* Primary — donate */
+    .link-primary{
+      background:var(--gold);
+      box-shadow:0 4px 20px rgba(201,168,76,.3);
+    }
+    .link-primary:hover{
+      box-shadow:0 8px 32px rgba(201,168,76,.45);
+    }
+    .link-primary .link-icon{color:var(--black)}
+    .link-primary .link-text{ color:var(--black) }
+    .link-primary .link-arrow{ color:rgba(10,10,10,.5) }
+
+    /* Secondary */
+    .link-secondary{
+      background:var(--black2);
+      border:1px solid var(--line);
+    }
+    .link-secondary:hover{ border-color:rgba(232,224,208,.25); }
+    .link-secondary .link-icon{ color:var(--gold) }
+    .link-secondary .link-text{ color:var(--cream) }
+    .link-secondary .link-arrow{ color:rgba(232,224,208,.3) }
+
+    /* Live tracker — special green accent */
+    .link-live{
+      background:var(--black2);
+      border:1px solid rgba(74,201,122,.3);
+    }
+    .link-live:hover{ border-color:rgba(74,201,122,.5); }
+    .link-live .link-icon{ color:#4ac97a }
+    .link-live .link-text{ color:var(--cream) }
+    .link-live .link-arrow{ color:rgba(74,201,122,.5) }
+    .live-dot{
+      display:inline-block;width:6px;height:6px;border-radius:50%;
+      background:#4ac97a;margin-right:.4rem;
+      animation:pulse-live 1.6s infinite;
+    }
+    @keyframes pulse-live{
+      0%,100%{opacity:1;transform:scale(1)}
+      50%{opacity:.4;transform:scale(.6)}
+    }
+
+    .link-icon{
+      font-size:1.3rem;flex-shrink:0;width:28px;text-align:center;
+    }
+    .link-body{flex:1}
+    .link-label{
+      font-size:.52rem;font-weight:600;
+      letter-spacing:.22em;text-transform:uppercase;
+      opacity:.55;margin-bottom:.18rem;
+    }
+    .link-primary .link-label{ color:var(--black) }
+    .link-secondary .link-label{ color:var(--cream-d) }
+
+    .link-text{
+      font-family:'Oswald',sans-serif;
+      font-size:.95rem;font-weight:600;
+      letter-spacing:.06em;text-transform:uppercase;
+      line-height:1;
+    }
+    .link-arrow{
+      font-size:.9rem;flex-shrink:0;
+      transition:transform .2s;
+    }
+    .link-btn:hover .link-arrow{ transform:translateX(3px); }
+
+    /* Stagger animation delays */
+    .link-btn:nth-child(1){animation-delay:.22s}
+    .link-btn:nth-child(2){animation-delay:.30s}
+    .link-btn:nth-child(3){animation-delay:.38s}
+    .link-btn:nth-child(4){animation-delay:.46s}
+
+    /* ── Footer ── */
+    .footer{
+      margin-top:2.2rem;
+      text-align:center;
+      animation:fadeUp .5s .5s ease both;
+    }
+    .footer-motto{
+      font-family:'Lora',serif;font-style:italic;
+      font-size:.65rem;color:rgba(232,224,208,.28);
+      letter-spacing:.1em;margin-bottom:.5rem;
+    }
+    .footer-road{
+      font-size:1.2rem;opacity:.2;
+      letter-spacing:.3em;
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeDown{
+      from{opacity:0;transform:translateY(-14px)}
+      to{opacity:1;transform:none}
+    }
+    @keyframes fadeUp{
+      from{opacity:0;transform:translateY(16px)}
+      to{opacity:1;transform:none}
+    }
+  </style>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-H9LV885NMX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-H9LV885NMX');
+  </script>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- Logo -->
+  <div class="logo-wrap">
+    <img src="hardmile-logo.png" alt="The Hard Mile"/>
+  </div>
+
+  <!-- Name & tagline -->
+  <h1 class="name">The Hard Mile</h1>
+  <p class="latin">Pro Aliis Milia Duramus</p>
+  <p class="tagline">We endure miles for others</p>
+
+  <div class="divider"></div>
+
+  <!-- Links -->
+  <div class="links">
+
+    <!-- Donate -->
+    <a class="link-btn link-primary"
+       href="https://www.justgiving.com/page/500kmrun1?utm_medium=FR&utm_source=CL"
+       target="_blank" rel="noopener">
+      <span class="link-icon">❤️</span>
+      <div class="link-body">
+        <div class="link-label">Support the Challenge</div>
+        <div class="link-text">Donate Now</div>
+      </div>
+      <span class="link-arrow">→</span>
+    </a>
+
+    <!-- Live Tracker -->
+    <a class="link-btn link-live"
+       href="https://thehardmile.com/track"
+       target="_blank" rel="noopener">
+      <span class="link-icon">🛰️</span>
+      <div class="link-body">
+        <div class="link-label"><span class="live-dot"></span>1st–4th July</div>
+        <div class="link-text">Track The Team Live</div>
+      </div>
+      <span class="link-arrow">→</span>
+    </a>
+
+    <!-- Website -->
+    <a class="link-btn link-secondary"
+       href="https://thehardmile.com"
+       target="_blank" rel="noopener">
+      <span class="link-icon">🏃</span>
+      <div class="link-body">
+        <div class="link-label">Follow the Journey</div>
+        <div class="link-text">Our Website</div>
+      </div>
+      <span class="link-arrow">→</span>
+    </a>
+
+    <!-- Charity -->
+    <a class="link-btn link-secondary"
+       href="https://www.cdlf.uk"
+       target="_blank" rel="noopener">
+      <span class="link-icon">🌟</span>
+      <div class="link-body">
+        <div class="link-label">The Charity We Run For</div>
+        <div class="link-text">CDLF Foundation</div>
+      </div>
+      <span class="link-arrow">→</span>
+    </a>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p class="footer-motto">Scotland → Thirsk · 500km · 1st–4th July 2026</p>
+    <p class="footer-road">🛣</p>
+  </div>
+
+</div>
+
+</body>
+</html>
